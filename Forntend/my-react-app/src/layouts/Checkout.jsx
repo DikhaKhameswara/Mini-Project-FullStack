@@ -16,9 +16,7 @@ export default function Checkout() {
     cart.map(item => totalAmount += item.subtotal);
 
     function handlePembayaran() {
-        if (cart.length != 0) {
-            navigate("/pembayaran");
-        }
+        navigate("/pembayaran");
     }
     return (
         <div className=' flex flex-col relative h-full'>
