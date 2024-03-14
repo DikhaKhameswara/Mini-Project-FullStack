@@ -3,7 +3,7 @@ import Checkout from '../layouts/Checkout';
 import Header from '../layouts/Header';
 import Products from '../layouts/Products';
 
-export default function Homepage() {
+export default function OrderProduk() {
 
     return (
         <div className='flex gap-x-2 h-[52rem] rounded-2xl border-4 p-2'>
@@ -15,7 +15,7 @@ export default function Homepage() {
                     <Products />
                 </div>
             </div>
-            <div className='w-1/3 border-4'>
+            <div className='w-1/3 border-4 h-full'>
                 <Checkout />
             </div>
         </div>

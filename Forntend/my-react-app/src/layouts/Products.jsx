@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import useSWR from 'swr';
-import Card from '../component/Card';
 import CategoriesButton from '../component/CategoriesButton';
+import ProductCard from '../component/ProductCard';
+import { addBarang } from '../store/reducer/cartSlice';
 import { axiosBackend } from '../utils/axios';
 
 export default function Products() {
@@ -9,7 +11,8 @@ export default function Products() {
     const [c_Id, setC_Id] = useState("");
     const [title, setTitle] = useState("");
     const [name, setName] = useState("");
-    const [coba, setCoba] = useState("");
+
+    const dispatch = useDispatch();
 
 
 
@@ -34,7 +37,15 @@ export default function Products() {
 
     function handleClickCategory(id) {
         setC_Id(`category_id=${id}`)
-        console.log(c_Id)
+    }
+
+    function handleClickAddBarang(item) {
+        const barang = {
+            ...item,
+            qty: 1,
+            subtotal: item.price
+        }
+        dispatch(addBarang(barang));
     }
 
     return (categories == undefined ? "" :
@@ -47,7 +58,7 @@ export default function Products() {
                     {
                         categories.map((item) => (
                             <div key={item.category_id} onClick={() => handleClickCategory(item.category_id)}>
-                                <CategoriesButton name={item.category_name} />
+                                <CategoriesButton name={item.category_name} category_id={item.category_id} idActive={c_Id} />
                             </div>
                         ))
                     }
@@ -63,10 +74,12 @@ export default function Products() {
                 </div>
 
             </div>
-            <div className='grid grid-cols-3 gap-2'>
+            <div className='grid grid-cols-3 gap-2 overflow-y-auto'>
                 {products == undefined || categories == undefined ? "" :
                     products.map((item) => (
-                        <Card key={item.id} name={item.title} image={item.image} price={item.price} />
+                        <div key={item.id} className=' cursor-pointer' onClick={() => handleClickAddBarang(item)}>
+                            <ProductCard name={item.title} image={item.image} price={item.price} />
+                        </div>
                     ))
                 }
             </div>

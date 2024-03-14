@@ -1,14 +1,16 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import "./index.css";
-import Homepage from "./pages/Homepage";
+import OrderProduk from "./pages/OrderProduk";
+import Pembayaran from "./pages/Pembayaran";
 
 export default function App() {
 
     return (
-        <div className="w-full h-100vh p-5 font-lora">
+        <div className="w-full h-100vh px-2 font-lora">
             <Routes>
-                <Route path="/" element={<Homepage />} />
+                <Route path="/" element={<OrderProduk />} />
+                <Route path="/pembayaran" element={<Pembayaran />} />
             </Routes>
         </div>
     )
