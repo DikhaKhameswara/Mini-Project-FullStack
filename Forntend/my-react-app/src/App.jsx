@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import "./index.css";
 import DetailTransaksi from "./pages/DetailTransaksi";
+import ListProduct from "./pages/ListProduct";
 import OrderProduk from "./pages/OrderProduk";
 import Pembayaran from "./pages/Pembayaran";
 import RiwayatTransaksi from "./pages/RiwayatTransaksi";
@@ -18,6 +19,7 @@ export default function App() {
                 </Route>
                 <Route path="/riwayat" element={<RiwayatTransaksi />} />
                 <Route path="/detailtransaksi/:id" element={<DetailTransaksi />} />
+                <Route path="/admin" element={<ListProduct />} />
             </Routes>
         </div>
     )

@@ -1,6 +1,5 @@
 
 export function toRupiah(harga) {
-    let uang = harga;
     let u2 = harga.toString();
 
     let huruf = "";

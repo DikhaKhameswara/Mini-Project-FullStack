@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import CurrencyInput from 'react-currency-input-field';
 import { HiOutlineShoppingCart } from "react-icons/hi2";
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import Button from '../component/Button';
 import PesananCard from '../component/PesananCard';
-import { resetCart } from '../store/reducer/cartSlice';
 import { axiosBackend } from '../utils/axios';
 import { toRupiah } from '../utils/toRupiah';
 
 export default function Pembayaran() {
 
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     const [totalPay, setTotalPay] = useState(0);
     const [kembalian, setKembalian] = useState(0);
@@ -45,8 +44,6 @@ export default function Pembayaran() {
 
     function bayar() {
 
-
-
         if (kembalian < 0 || totalPay.toString() == NaN.toString()) {
             return popUp("Pembayaran Dibatalkan", "Uang Tidak Cukup", "error");
         }
@@ -60,16 +57,16 @@ export default function Pembayaran() {
             };
             tDList.push(tD);
         }
-        const data = {
+        const request = {
             total_amount: totalAmount,
             total_pay: totalPay,
             transaction_details: tDList
         }
-        axiosBackend.post("/addtransaction", data)
+        axiosBackend.post("/addtransaction", request)
             .then((res) => {
                 console.log(res.data);
+                sessionStorage.setItem("pembayaran", "berhasil");
                 popUp(res.data?.data, res.data?.message, "success");
-                dispatch(resetCart());
                 navigate("/");
             })
             .catch((err) => {
@@ -83,11 +80,16 @@ export default function Pembayaran() {
     return (
         <div className='flex h-[52rem] p-2 gap-x-2'>
             <div className=' border-4 w-3/5 p-2 h-full relative'>
-                <div className=' text-5xl m-5 relative right-5'>
+                <div className=' absolute' onClick={() => navigate("/")}>
+                    <Button>
+                        Back
+                    </Button>
+                </div>
+                <div className=' text-5xl m-5 absolute right-5'>
                     Rincian Pesanan
                     <hr />
                 </div>
-                <div className=' max-h-[43rem] overflow-auto grid grid-flow-row gap-y-3'>
+                <div className=' h-[43rem] overflow-auto grid grid-flow-row gap-y-3 mt-[5rem] rounded-3xl'>
                     {
                         cart.map((item) => (
                             <PesananCard key={item.id} name={item.title} image={item.image} price={item.price} quantity={item.qty} subtotal={item.subtotal} />

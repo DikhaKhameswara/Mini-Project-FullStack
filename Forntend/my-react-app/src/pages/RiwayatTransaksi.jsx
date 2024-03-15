@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import Button from '../component/Button';
 import { axiosBackend } from '../utils/axios';
+import { handleDate } from '../utils/handleDate';
 import { toRupiah } from '../utils/toRupiah';
 
 
@@ -29,7 +30,7 @@ export default function RiwayatTransaksi() {
             <div className=' flex place-content-center'>
                 <table className="text-left w-full">
                     <thead className="bg-black flex text-white w-full">
-                        <tr className="flex w-full mb-4">
+                        <tr className="flex w-full mb-4 text-2xl">
                             <th className="p-4 w-[22%]">Tanggal Transaksi</th>
                             <th className="p-4 w-[22%]">ID Transaksi</th>
                             <th className="p-4 w-[22%]">Total Harga</th>
@@ -41,7 +42,7 @@ export default function RiwayatTransaksi() {
                         {
                             data.map((item) => (
                                 <tr key={item.transaction_id} className=' flex w-full mb-4'>
-                                    <td className=' p-4 w-[22%]'>{item.transaction_date}</td>
+                                    <td className=' p-4 w-[22%]'>{handleDate(item.transaction_date)}</td>
                                     <td className=' p-4 w-[22%]'>{item.transaction_id}</td>
                                     <td className=' p-4 w-[22%]'>{toRupiah(item.total_amount)}</td>
                                     <td className=' p-4 w-[22%]' >{toRupiah(item.total_pay)}</td>

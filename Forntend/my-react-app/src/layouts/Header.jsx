@@ -13,7 +13,7 @@ export default function Header() {
                 LYR Team PC
             </div>
             <div className=' flex gap-x-7'>
-                <div>
+                <div onClick={() => navigate("/admin")}>
                     <Button children={"Admin"} logo={<SiAdminer />} />
                 </div>
                 <div onClick={() => navigate("/riwayat")}>
