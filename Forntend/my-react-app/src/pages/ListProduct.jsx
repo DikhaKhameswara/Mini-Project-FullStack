@@ -41,7 +41,7 @@ export default function ListProduct() {
                                             <td className=' p-1 pl-2 w-[20%] border-y-2 h-[4rem] flex place-items-center'>{toRupiah(item.price)}</td>
                                             <td className=' p-1 pl-2 w-[20%] border-y-2 h-[4rem] flex place-items-center' >{item.category_name}</td>
                                             <td className=' p-1 pl-2 w-[20%] border-y-2 h-[4rem] grid grid-flow-col place-content-around text-sm' >
-                                                <span><Button>Detail</Button></span>
+                                                <span onClick={() => navigate(`/detailproduk/${item.id}`)}><Button>Detail</Button></span>
                                                 <span><Button>Edit</Button></span>
                                                 <span><Button>Hapus</Button></span>
                                             </td>

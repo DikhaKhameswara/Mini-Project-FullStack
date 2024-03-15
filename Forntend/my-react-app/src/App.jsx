@@ -1,6 +1,8 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
+import AddUpdateForm from "./component/AddUpdateForm";
 import "./index.css";
+import DetailProduk from "./pages/DetailProduk";
 import DetailTransaksi from "./pages/DetailTransaksi";
 import ListProduct from "./pages/ListProduct";
 import OrderProduk from "./pages/OrderProduk";
@@ -20,6 +22,8 @@ export default function App() {
                 <Route path="/riwayat" element={<RiwayatTransaksi />} />
                 <Route path="/detailtransaksi/:id" element={<DetailTransaksi />} />
                 <Route path="/admin" element={<ListProduct />} />
+                <Route path="/detailproduk/:id" element={<DetailProduk />} />
+                <Route path="/addupdateform" element={<AddUpdateForm />} />
             </Routes>
         </div>
     )
