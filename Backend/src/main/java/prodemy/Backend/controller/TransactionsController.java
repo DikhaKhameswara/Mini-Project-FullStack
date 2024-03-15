@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import prodemy.Backend.model.request.AddTransactionsRequest;
 import prodemy.Backend.model.response.DetailsTransactionResponse;
+import prodemy.Backend.model.response.ResponseSuccess;
 import prodemy.Backend.model.response.TransactionsResponse;
-import prodemy.Backend.model.response.WebResponse;
 import prodemy.Backend.service.TransactionsService;
 
 @RestController
@@ -25,37 +26,27 @@ public class TransactionsController {
     private TransactionsService tService;
 
     @GetMapping("/listtransaction")
-    public WebResponse<List<TransactionsResponse>> allTransactions() {
+    public ResponseEntity<List<TransactionsResponse>> allTransactions() {
         List<TransactionsResponse> tR = tService.getAllTransactions();
 
-        return WebResponse.<List<TransactionsResponse>>builder()
-                .data(tR)
-                .message("success")
-                .status(HttpStatus.OK)
-                .build();
+        return new ResponseEntity<List<TransactionsResponse>>(tR, HttpStatus.OK);
     }
 
     @GetMapping("/detailtransaction/{id}")
-    public WebResponse<DetailsTransactionResponse> transactionsById(@PathVariable Long id) {
+    public ResponseEntity<DetailsTransactionResponse> transactionsById(@PathVariable Long id) {
         DetailsTransactionResponse tR = tService.getTransactionsById(id);
 
-        return WebResponse.<DetailsTransactionResponse>builder()
-                .data(tR)
-                .message("success")
-                .status(HttpStatus.OK)
-                .build();
+        return new ResponseEntity<DetailsTransactionResponse>(tR, HttpStatus.OK);
     }
 
     @PostMapping("/addtransaction")
-    public WebResponse<String> postAddTransactions(@RequestBody AddTransactionsRequest request) {
+    public ResponseEntity<ResponseSuccess> postAddTransactions(@RequestBody AddTransactionsRequest request) {
 
         tService.addTransactionDetails(request);
 
-        return WebResponse.<String>builder()
-                .data("Transaksi Berhasil Ditambahkan")
-                .message("success")
-                .status(HttpStatus.OK)
-                .build();
+        return new ResponseEntity<ResponseSuccess>(
+                ResponseSuccess.builder().build(),
+                HttpStatus.OK);
 
     }
 }

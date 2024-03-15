@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import prodemy.Backend.model.request.AddUpdateProductRequest;
 import prodemy.Backend.model.request.RequestParams;
 import prodemy.Backend.model.response.ProductsResponse;
-import prodemy.Backend.model.response.WebResponse;
+import prodemy.Backend.model.response.ResponseSuccess;
 import prodemy.Backend.service.ProductsService;
 
 @RestController
@@ -28,7 +29,7 @@ public class ProductsController {
     ProductsService productsService;
 
     @GetMapping("/listproduct")
-    public WebResponse<List<ProductsResponse>> getAllProducts(HttpServletRequest request) {
+    public ResponseEntity<List<ProductsResponse>> getAllProducts(HttpServletRequest request) {
 
         String titleSearch = request.getParameter("title");
         String categoryId = request.getParameter("category_id");
@@ -43,59 +44,45 @@ public class ProductsController {
 
         List<ProductsResponse> pR = productsService.getAllProducts(req);
 
-        return WebResponse.<List<ProductsResponse>>builder()
-                .data(pR)
-                .message("Data Semua Produk")
-                .status(HttpStatus.OK)
-                .build();
+        return new ResponseEntity<List<ProductsResponse>>(pR, HttpStatus.OK);
     }
 
     @GetMapping("/detailproduct/{id}")
-    public WebResponse<ProductsResponse> getDetailProduct(@PathVariable Long id) {
+    public ResponseEntity<ProductsResponse> getDetailProduct(@PathVariable Long id) {
 
         ProductsResponse pR = productsService.getDetailsProduct(id);
-        return WebResponse.<ProductsResponse>builder()
-                .data(pR)
-                .status(HttpStatus.OK)
-                .message("Detail Produk id:" + id)
-                .build();
+        return new ResponseEntity<ProductsResponse>(pR, HttpStatus.OK);
     }
 
     @PostMapping("/addproduct")
-    public WebResponse<String> postAddProduct(@RequestBody AddUpdateProductRequest request,
+    public ResponseEntity<ResponseSuccess> postAddProduct(@RequestBody AddUpdateProductRequest request,
             HttpServletRequest request2) {
 
         productsService.addProduct(request);
 
-        return WebResponse.<String>builder()
-                .data("Add Product Berhasil")
-                .message("success")
-                .status(HttpStatus.OK)
-                .build();
+        return new ResponseEntity<ResponseSuccess>(
+                ResponseSuccess.builder().build(),
+                HttpStatus.OK);
     }
 
     @PutMapping("/updateproduct/{id}")
-    public WebResponse<String> putUpdateProduct(@RequestBody AddUpdateProductRequest request, @PathVariable Long id) {
+    public ResponseEntity<ResponseSuccess> putUpdateProduct(@RequestBody AddUpdateProductRequest request,
+            @PathVariable Long id) {
 
         productsService.updateproduct(id, request);
-
-        return WebResponse.<String>builder()
-                .data("Update Product Berhasil")
-                .message("success")
-                .status(HttpStatus.OK)
-                .build();
+        return new ResponseEntity<ResponseSuccess>(
+                ResponseSuccess.builder().build(),
+                HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteproduct/{id}")
-    public WebResponse<String> deleteDeleteProduct(@PathVariable Long id) {
+    public ResponseEntity<ResponseSuccess> deleteDeleteProduct(@PathVariable Long id) {
 
         productsService.deleteProduct(id);
 
-        return WebResponse.<String>builder()
-                .data("Delete Product Berhasil")
-                .message("success")
-                .status(HttpStatus.OK)
-                .build();
+        return new ResponseEntity<ResponseSuccess>(
+                ResponseSuccess.builder().build(),
+                HttpStatus.OK);
     }
 
 }

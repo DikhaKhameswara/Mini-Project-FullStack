@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import CurrencyInput from 'react-currency-input-field';
 import { HiOutlineShoppingCart } from "react-icons/hi2";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Button from '../component/Button';
 import PesananCard from '../component/PesananCard';
+import { resetCart } from '../store/reducer/cartSlice';
 import { axiosBackend } from '../utils/axios';
 import { toRupiah } from '../utils/toRupiah';
 
 export default function Pembayaran() {
 
     const navigate = useNavigate();
+
+    const dispatch = useDispatch();
 
     const [totalPay, setTotalPay] = useState(0);
     const [kembalian, setKembalian] = useState(0);
@@ -35,7 +38,7 @@ export default function Pembayaran() {
     }
 
     function popUp(data, message, icon) {
-        Swal.fire({
+        return Swal.fire({
             title: data,
             text: message,
             icon: icon
@@ -65,9 +68,12 @@ export default function Pembayaran() {
         axiosBackend.post("/addtransaction", request)
             .then((res) => {
                 console.log(res.data);
-                sessionStorage.setItem("pembayaran", "berhasil");
-                popUp(res.data?.data, res.data?.message, "success");
-                navigate("/");
+                popUp("Pembayaran Tuntas", "SUCCESS", "success").then((res) => {
+                    navigate("/");
+                    if (res.isConfirmed) {
+                        dispatch(resetCart());
+                    }
+                });
             })
             .catch((err) => {
                 console.log(err);

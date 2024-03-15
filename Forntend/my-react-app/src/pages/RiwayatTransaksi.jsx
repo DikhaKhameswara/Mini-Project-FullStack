@@ -10,7 +10,7 @@ import { toRupiah } from '../utils/toRupiah';
 
 export default function RiwayatTransaksi() {
 
-    const fetcher = (url) => axiosBackend.get(url).then(res => res.data?.data);
+    const fetcher = (url) => axiosBackend.get(url).then(res => res.data);
     const { data, isLoading } = useSWR("/listtransaction", fetcher);
     console.log(data);
 

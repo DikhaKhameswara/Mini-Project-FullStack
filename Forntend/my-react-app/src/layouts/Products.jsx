@@ -16,9 +16,11 @@ export default function Products() {
 
 
 
-    const fetcher = (url) => axiosBackend.get(url).then((res) => res.data.data);
+    const fetcher = (url) => axiosBackend.get(url).then((res) => res.data);
     const { data: categories, isLoading: iLCategories } = useSWR('/listcategories', fetcher);
     const { data: products, isLoading: iLProducts } = useSWR(`/listproduct?${c_Id + '&' + name}`, fetcher);
+
+    axiosBackend.get("/listproduct").then((res) => console.log(res));
 
     useEffect(() => {
         if (title == "") {

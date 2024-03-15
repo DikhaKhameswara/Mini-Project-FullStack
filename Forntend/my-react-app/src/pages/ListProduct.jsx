@@ -7,7 +7,7 @@ import { toRupiah } from '../utils/toRupiah';
 
 export default function ListProduct() {
 
-    const fetcher = (url) => axiosBackend.get(url).then((res) => res.data?.data);
+    const fetcher = (url) => axiosBackend.get(url).then((res) => res.data);
     const { data, isLoading } = useSWR("/listproduct", fetcher);
 
     const navigate = useNavigate();
