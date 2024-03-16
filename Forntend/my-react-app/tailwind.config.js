@@ -5,6 +5,7 @@ export default {
         extend: {
             fontFamily: {
                 lora: ["Lora", "serif"],
+                saira: ["Saira Semi Condensed", "sans-serif"]
             }
         },
     },

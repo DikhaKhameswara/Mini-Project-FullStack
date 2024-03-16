@@ -12,7 +12,7 @@ export default function RiwayatTransaksi() {
 
     const fetcher = (url) => axiosBackend.get(url).then(res => res.data);
     const { data, isLoading } = useSWR("/listtransaction", fetcher);
-    console.log(data);
+
 
     const navigate = useNavigate();
 

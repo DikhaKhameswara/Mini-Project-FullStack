@@ -13,9 +13,7 @@ export default function DetailTransaksi() {
 
     const fetcher = (url) => axiosBackend.get(url).then((res) => res.data);
     const { data, isLoading } = useSWR(`/detailtransaction/${params.id}`, fetcher);
-    setTimeout(() => {
-        console.log(data?.product_details_transaction[0])
-    }, 2000);
+
 
 
     return (isLoading ? "" :

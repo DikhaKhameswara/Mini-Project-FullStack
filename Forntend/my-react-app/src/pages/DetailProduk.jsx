@@ -30,36 +30,38 @@ export default function DetailProduk() {
             <div className=' flex place-content-around w-[95%] h-[35rem]'>
                 <div className='mb-[1rem] p-1 h-full w-[45%]'>
                     <table className=' text-left text-3xl h-[70%] grid grid-flow-row gap-y-5'>
-                        <tr>
-                            <th className=' w-[15rem]'>ID </th>
-                            <td className=' w-[1rem] text-right'>:</td>
-                            <td className=' text-left text-2xl pl-3'>{data?.id}</td>
-                        </tr>
-                        <tr className=''>
-                            <th className=' w-[15rem] text-nowrap'>Nama Produk</th>
-                            <td className=' w-[1rem] text-right'>:</td>
-                            <td className=' text-left text-2xl pl-3'>{data?.title}</td>
-                        </tr>
-                        <tr className=''>
-                            <th className=' w-[15rem] text-nowrap'>Harga Satuan</th>
-                            <td className=' w-[1rem] text-right'>:</td>
-                            <td className=' text-left text-2xl pl-3'>{toRupiah(data?.price)}</td>
-                        </tr>
-                        <tr className=''>
-                            <th className=' w-[15rem] text-nowrap'>URL Gambar</th>
-                            <td className=' w-[1rem] text-right'>:</td>
-                            <td className=' text-left text-2xl pl-3'>{handleUrl(data?.image)}</td>
-                        </tr>
-                        <tr className=''>
-                            <th className=' w-[15rem] text-nowrap'>ID Kategori</th>
-                            <td className=' w-[1rem] text-right'>:</td>
-                            <td className=' text-left text-2xl pl-3'>{data?.category_id}</td>
-                        </tr>
-                        <tr className=''>
-                            <th className=' w-[15rem] text-nowrap'>Nama Kategori</th>
-                            <td className=' w-[1rem] text-right'>:</td>
-                            <td className=' text-left text-2xl pl-3'>{data?.category_name}</td>
-                        </tr>
+                        <tbody>
+                            <tr className='flex flex-row'>
+                                <th className=' w-[15rem]'>ID </th>
+                                <td className=' w-[1rem] text-right'>:</td>
+                                <td className=' text-left text-2xl pl-3 flex place-items-center'>{data?.id}</td>
+                            </tr>
+                            <tr className='flex flex-row'>
+                                <th className=' w-[15rem] text-nowrap'>Nama Produk</th>
+                                <td className=' w-[1rem] text-right'>:</td>
+                                <td className=' text-left text-2xl pl-3 flex place-items-center'>{data?.title}</td>
+                            </tr>
+                            <tr className='flex flex-row'>
+                                <th className=' w-[15rem] text-nowrap'>Harga Satuan</th>
+                                <td className=' w-[1rem] text-right'>:</td>
+                                <td className=' text-left text-2xl pl-3 flex place-items-center'>{toRupiah(data?.price)}</td>
+                            </tr>
+                            <tr className='flex flex-row'>
+                                <th className=' w-[15rem] text-nowrap'>URL Gambar</th>
+                                <td className=' w-[1rem] text-right'>:</td>
+                                <td className=' text-left text-2xl pl-3 flex place-items-center'>{handleUrl(data?.image)}</td>
+                            </tr>
+                            <tr className='flex flex-row'>
+                                <th className=' w-[15rem] text-nowrap'>ID Kategori</th>
+                                <td className=' w-[1rem] text-right'>:</td>
+                                <td className=' text-left text-2xl pl-3 flex place-items-center'>{data?.category_id}</td>
+                            </tr>
+                            <tr className='flex flex-row'>
+                                <th className=' w-[15rem] text-nowrap'>Nama Kategori</th>
+                                <td className=' w-[1rem] text-right'>:</td>
+                                <td className=' text-left text-2xl pl-3 flex place-items-center'>{data?.category_name}</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
                 <div className=' w-[30%]'>
