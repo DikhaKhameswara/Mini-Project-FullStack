@@ -1,10 +1,12 @@
 import React from 'react';
 import { AiFillFire } from "react-icons/ai";
 import { BiSmile } from "react-icons/bi";
-import { useSelector } from 'react-redux';
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CheckoutCard from '../component/CheckoutCard';
-import { Swall } from '../utils/Swall';
+import { resetCart } from '../store/reducer/cartSlice';
+import { swallConfirmation, swallPopUp } from '../utils/mySwal';
 import { toRupiah } from '../utils/toRupiah';
 
 
@@ -13,20 +15,33 @@ export default function Checkout() {
 
     const navigate = useNavigate();
 
+    const dispatch = useDispatch();
+
     const cart = useSelector((state) => state.cart);
 
     let totalAmount = 0;
     cart.map(item => totalAmount += item.subtotal);
 
-    function handlePembayaran() {
-
-        // Swall()
-        navigate("/pembayaran");
+    function removeBarangFromCart() {
+        swallConfirmation()
+            .then(() => {
+                swallPopUp("Semua Barang Berhasil Dihapus", "", "success");
+                dispatch(resetCart());
+            })
+            .catch(() => swallPopUp("Barang Tidak Jadi Dihapus", "", "info"));
     }
+
     return (
         <div className=' flex flex-col relative h-full'>
-            <div className=' text-5xl mb-[5rem] flex gap-x-2 place-items-center place-content-center h-[10%]'>
+            <div className=' text-5xl mb-[2rem] flex gap-x-2 place-items-center place-content-center h-[10%]'>
                 <span>Pesananmu Kawann</span> <AiFillFire className=' text-red-500' />
+            </div>
+            <div className='w-full flex place-content-end h-[3.5rem] mb-1 relative'>
+                <button
+                    onClick={() => removeBarangFromCart()}
+                    className=' bg-red-300 hover:bg-red-500 active:bg-red-700 active:text-white rounded-xl absolute right-2 h-[3rem] p-2 font-medium flex place-items-center gap-x-2'>
+                    <FaRegTrashAlt />Hapus Semua Barang
+                </button>
             </div>
             <div className='h-[30rem] overflow-auto border-2 border-gray-500 rounded-lg p-2'>
                 {cart.length == 0 ?
@@ -49,7 +64,8 @@ export default function Checkout() {
                         }
                     </div>
                 </div>
-                <div className=' text-3xl h-[5rem] border-4 mx-3 my-1 grid place-content-center rounded-xl bg-green-400 active:bg-green-600 hover:scale-105 select-none cursor-pointer' onClick={() => handlePembayaran()}>
+                <div onClick={() => navigate("/pembayaran")}
+                    className=' text-3xl h-[5rem] border-4 mx-3 my-1 grid place-content-center rounded-xl bg-green-400 active:bg-green-600 hover:scale-105 select-none cursor-pointer'>
                     Pembayaran
                 </div>
             </div>

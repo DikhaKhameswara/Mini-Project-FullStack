@@ -3,6 +3,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { FiMinusCircle, FiPlusCircle } from "react-icons/fi";
 import { useDispatch } from 'react-redux';
 import { deleteBarang, setQuantity } from '../store/reducer/cartSlice';
+import { swallConfirmation, swallPopUp } from '../utils/mySwal';
 import { toRupiah } from '../utils/toRupiah';
 
 
@@ -17,12 +18,21 @@ function handleLengthName(name) {
     }
 }
 
+function removeBarangFromCart(id, dispatch) {
+    swallConfirmation()
+        .then(() => {
+            dispatch(deleteBarang(id));
+            swallPopUp("Barang Berhasil Dihapus", "", "success");
+        })
+        .catch(() => swallPopUp("Barang Tidak Jadi Dihapus", "", "info"));
+}
+
 function quantity(id, qty, dispatch) {
     return (
         <div className='flex flex-row gap-x-2 place-items-center'>
             {
                 qty == 1 ?
-                    <div className=' cursor-pointer' onClick={() => dispatch(deleteBarang(id))}><FaRegTrashAlt /></div>
+                    <div className=' cursor-pointer' onClick={() => removeBarangFromCart(id, dispatch)}><FaRegTrashAlt /></div>
                     :
                     <div className=' cursor-pointer' onClick={() => dispatch(setQuantity({ id, increment: false }))}><FiMinusCircle /></div>
             }
@@ -49,7 +59,7 @@ export default function CheckoutCard({ name, price, qty, subTotal, id }) {
             <div className=' absolute bottom-1 right-1'>
                 {toRupiah(subTotal)}
             </div>
-            <div className=' absolute top-1 right-1' onClick={() => dispatch(deleteBarang(id))}>
+            <div className=' absolute top-1 right-1' onClick={() => removeBarangFromCart(id, dispatch)}>
                 <FaRegTrashAlt className=' cursor-pointer' />
             </div>
         </div>
