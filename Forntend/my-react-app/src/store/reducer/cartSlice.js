@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import Swal from "sweetalert2";
 
-function popUp(data, message, icon) {
+function swallPopUp(data, message, icon) {
     Swal.fire({
         title: data,
         text: message,
@@ -12,7 +12,7 @@ function popUp(data, message, icon) {
 function isIdExist(state, id) {
     for (const item of state) {
         if (item.id == id) {
-            popUp("Data Tidak Ditambahkan", "Data Sudah Ada Pada Cart", "warning")
+            swallPopUp("Data Tidak Ditambahkan", "Data Sudah Ada Pada Cart", "warning")
             return true;
         }
     }

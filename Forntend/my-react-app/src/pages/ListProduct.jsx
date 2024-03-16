@@ -1,17 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaPlus } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import Button from '../component/Button';
 import { axiosBackend } from '../utils/axios';
+import { swallConfirmation, swallPopUp } from '../utils/mySwal';
 import { toRupiah } from '../utils/toRupiah';
 
 export default function ListProduct() {
 
     const fetcher = (url) => axiosBackend.get(url).then((res) => res.data);
-    const { data, isLoading } = useSWR("/listproduct", fetcher);
+    const { data, isLoading, mutate } = useSWR("/listproduct", fetcher);
+
+    useEffect(() => {
+        mutate()
+    }, [data])
 
     const navigate = useNavigate();
+
+    function handleHapus(id) {
+        swallConfirmation()
+            .then(() => {
+                axiosBackend.delete(`/deleteproduct/${id}`)
+                    .then(() => {
+                        swallPopUp("Data Berhasil Dihapus", "", "success");
+                        mutate();
+                    })
+                    .catch(() => swallPopUp("Data Gagal Dihapus", "", "error"))
+            })
+            .catch(() => swallPopUp("Data Tidak Jadi Dihapus", "", "error"))
+
+    }
     return (
         <div className=' flex flex-col p-[2%] w-full gap-y-[1rem]'>
             <div className=' relative flex place-content-between w-full border-b-4 border-black'>
@@ -58,6 +77,7 @@ export default function ListProduct() {
                                                     Edit
                                                 </button>
                                                 <button
+                                                    onClick={() => handleHapus(item.id)}
                                                     className={`bg-red-400 hover:bg-slate-400 p-2 rounded-xl font-bold  flex place-content-center gap-x-2 w-1/3`}>
                                                     Hapus
                                                 </button>

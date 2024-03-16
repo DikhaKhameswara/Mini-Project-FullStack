@@ -3,11 +3,11 @@ import CurrencyInput from 'react-currency-input-field';
 import { HiOutlineShoppingCart } from "react-icons/hi2";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
 import Button from '../component/Button';
 import PesananCard from '../component/PesananCard';
 import { resetCart } from '../store/reducer/cartSlice';
 import { axiosBackend } from '../utils/axios';
+import { swallPopUp } from '../utils/mySwal';
 import { toRupiah } from '../utils/toRupiah';
 
 export default function Pembayaran() {
@@ -37,18 +37,18 @@ export default function Pembayaran() {
         }
     }
 
-    function popUp(data, message, icon) {
-        return Swal.fire({
-            title: data,
-            text: message,
-            icon: icon
-        });
-    }
+    // function swallPopUp(data, message, icon) {
+    //     return Swal.fire({
+    //         title: data,
+    //         text: message,
+    //         icon: icon
+    //     });
+    // }
 
     function bayar() {
 
         if (kembalian < 0 || totalPay.toString() == NaN.toString()) {
-            return popUp("Pembayaran Dibatalkan", "Uang Tidak Cukup", "error");
+            return swallPopUp("Pembayaran Dibatalkan", "Uang Tidak Cukup", "error");
         }
 
         let tDList = [];
@@ -68,7 +68,7 @@ export default function Pembayaran() {
         axiosBackend.post("/addtransaction", request)
             .then((res) => {
                 console.log(res.data);
-                popUp("Pembayaran Tuntas", "SUCCESS", "success").then((res) => {
+                swallPopUp("Pembayaran Tuntas", "SUCCESS", "success").then((res) => {
                     navigate("/");
                     if (res.isConfirmed) {
                         dispatch(resetCart());
@@ -77,7 +77,7 @@ export default function Pembayaran() {
             })
             .catch((err) => {
                 console.log(err);
-                popUp("Error", "message", "error")
+                swallPopUp("Error", "message", "error")
             })
 
 
