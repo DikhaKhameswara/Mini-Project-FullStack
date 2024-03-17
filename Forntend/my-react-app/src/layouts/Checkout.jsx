@@ -23,7 +23,7 @@ export default function Checkout() {
     cart.map(item => totalAmount += item.subtotal);
 
     function removeBarangFromCart() {
-        swallConfirmation()
+        swallConfirmation("Apakah Anda Ingin Menghapus Semua Barang Di Cart?")
             .then(() => {
                 swallPopUp("Semua Barang Berhasil Dihapus", "", "success");
                 dispatch(resetCart());
@@ -31,17 +31,24 @@ export default function Checkout() {
             .catch(() => swallPopUp("Barang Tidak Jadi Dihapus", "", "info"));
     }
 
+    console.log(cart)
+
     return (
-        <div className=' flex flex-col relative h-full'>
-            <div className=' text-5xl mb-[2rem] flex gap-x-2 place-items-center place-content-center h-[10%]'>
-                <span>Pesananmu Kawann</span> <AiFillFire className=' text-red-500' />
+        <div className=' flex flex-col relative h-full w-full'>
+            <div className=' text-5xl mb-[2rem] flex gap-x-2 place-items-center place-content-center h-[5rem]'>
+                <span>Pesananmu Kawann</span>
+                <AiFillFire className=' text-red-500' />
             </div>
             <div className='w-full flex place-content-end h-[3.5rem] mb-1 relative'>
-                <button
-                    onClick={() => removeBarangFromCart()}
-                    className=' bg-red-300 hover:bg-red-500 active:bg-red-700 active:text-white rounded-xl absolute right-2 h-[3rem] p-2 font-medium flex place-items-center gap-x-2'>
-                    <FaRegTrashAlt />Hapus Semua Barang
-                </button>
+                {
+                    cart?.length == 0 ? "" :
+                        <button
+                            onClick={() => removeBarangFromCart()}
+                            className=' bg-red-300 hover:bg-red-500 active:bg-red-700 active:text-white rounded-xl absolute right-2 h-[3rem] p-2 font-medium flex place-items-center gap-x-2'>
+                            <FaRegTrashAlt />Hapus Semua Barang
+                        </button>
+                }
+
             </div>
             <div className='h-[30rem] overflow-auto border-2 border-gray-500 rounded-lg p-2'>
                 {cart.length == 0 ?

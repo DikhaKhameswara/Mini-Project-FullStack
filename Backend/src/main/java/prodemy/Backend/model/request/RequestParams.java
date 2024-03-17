@@ -14,5 +14,5 @@ public class RequestParams {
     String titleSearch;
     String categoryId;
     String sortBy;
-    String sortAsc;
+    String sortOrder;
 }

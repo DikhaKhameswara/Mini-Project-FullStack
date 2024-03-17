@@ -7,7 +7,7 @@ import Button from '../component/Button';
 import PesananCard from '../component/PesananCard';
 import { resetCart } from '../store/reducer/cartSlice';
 import { axiosBackend } from '../utils/axios';
-import { swallPopUp } from '../utils/mySwal';
+import { swallConfirmation, swallPopUp } from '../utils/mySwal';
 import { toRupiah } from '../utils/toRupiah';
 
 export default function Pembayaran() {
@@ -65,37 +65,40 @@ export default function Pembayaran() {
             total_pay: totalPay,
             transaction_details: tDList
         }
-        axiosBackend.post("/addtransaction", request)
-            .then((res) => {
-                console.log(res.data);
-                swallPopUp("Pembayaran Tuntas", "SUCCESS", "success").then((res) => {
-                    navigate("/");
-                    if (res.isConfirmed) {
-                        dispatch(resetCart());
-                    }
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-                swallPopUp("Error", "message", "error")
-            })
 
-
+        swallConfirmation("Apakah Anda Ingin Melakukan Pembayaran Ini?")
+            .then(() => {
+                axiosBackend.post("/addtransaction", request)
+                    .then((res) => {
+                        console.log(res.data);
+                        swallPopUp("Pembayaran Tuntas", "SUCCESS", "success")
+                            .then(() => {
+                                navigate("/");
+                                dispatch(resetCart());
+                            })
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        swallPopUp("Error", "Pengiriman Bermasalah", "error");
+                    })
+            })
+            .catch(() => swallPopUp("Pembayaran Dibatalkan", "", "info"));
     }
 
     return (
         <div className='flex h-[52rem] p-2 gap-x-2'>
-            <div className=' border-4 w-3/5 p-2 h-full relative'>
-                <div className=' absolute' onClick={() => navigate("/")}>
-                    <Button>
-                        Back
-                    </Button>
+            <div className=' border-4 rounded-xl w-3/5 p-2 h-full flex flex-col place-content-between relative'>
+                <div className=' border-b-4 border-red-700 relative h-[5rem]'>
+                    <div className=' absolute' onClick={() => navigate("/")}>
+                        <Button>
+                            Back
+                        </Button>
+                    </div>
+                    <div className=' text-5xl m-5 absolute right-5'>
+                        Rincian Pesanan
+                    </div>
                 </div>
-                <div className=' text-5xl m-5 absolute right-5'>
-                    Rincian Pesanan
-                    <hr />
-                </div>
-                <div className=' h-[43rem] overflow-auto grid grid-flow-row gap-y-3 mt-[5rem] rounded-3xl'>
+                <div className=' h-[43rem] overflow-auto flex flex-col gap-y-3 rounded-3xl'>
                     {
                         cart.map((item) => (
                             <PesananCard key={item.id} name={item.title} image={item.image} price={item.price} quantity={item.qty} subtotal={item.subtotal} />
@@ -103,10 +106,9 @@ export default function Pembayaran() {
                     }
                 </div>
             </div>
-            <div className=' border-4 w-2/5 flex flex-col place-items-center gap-y-9 relative p-7'>
-                <div className=' text-5xl'>
+            <div className=' border-4 w-2/5 flex flex-col place-items-center gap-y-9 relative p-7 rounded-xl'>
+                <div className=' text-5xl border-b-4 border-red-700 p-1'>
                     Pembayaran
-                    <hr />
                 </div>
                 <div className=' text-4xl mt-9 flex place-content-between w-full'>
                     <span>Total:</span>

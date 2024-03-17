@@ -18,8 +18,8 @@ export default function ListProduct() {
 
     const navigate = useNavigate();
 
-    function handleHapus(id) {
-        swallConfirmation()
+    function handleHapus(id, title) {
+        swallConfirmation(`Anda Ingin Menghapus \n${title}?`)
             .then(() => {
                 axiosBackend.delete(`/deleteproduct/${id}`)
                     .then(() => {
@@ -28,7 +28,7 @@ export default function ListProduct() {
                     })
                     .catch(() => swallPopUp("Data Gagal Dihapus", "", "error"))
             })
-            .catch(() => swallPopUp("Data Tidak Jadi Dihapus", "", "error"))
+            .catch(() => swallPopUp("Data Tidak Jadi Dihapus", "", "info"))
 
     }
     return (
@@ -77,7 +77,7 @@ export default function ListProduct() {
                                                     Edit
                                                 </button>
                                                 <button
-                                                    onClick={() => handleHapus(item.id)}
+                                                    onClick={() => handleHapus(item.id, item.title)}
                                                     className={`bg-red-400 hover:bg-slate-400 p-2 rounded-xl font-bold  flex place-content-center gap-x-2 w-1/3`}>
                                                     Hapus
                                                 </button>

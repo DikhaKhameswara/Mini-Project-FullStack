@@ -23,15 +23,25 @@ export default function FormProducts() {
         const { data: dU, isLoading: iLU } = useSWR(`/detailproduct/${id}`, fetcher);
         dataUpdate = dU;
         iLUpdate = iLU;
-
     }
+
     const { data: categories, isLoading: iLCategories } = useSWR("/listcategories", fetcher);
+    let [categoryId, setCategoryId] = useState([]);
+    useEffect(() => {
+        if (categories) {
+            for (const c of categories) {
+                categoryId.push(c.category_id)
+                setCategoryId(categoryId);
+            }
+        }
+    }, [categories])
 
     const schema = object().shape({
         title: string().defined().required("NAMA PRODUK BERMASALAH"),
         image: string().url().required("URL GAMBAR BERMASALAH"),
-        price: number().min(1, "HARGA PRODUK BERMASALAH").required("HARGA PRODUK BERMASALAH"),
-        category_id: number("KATEGORI BELUM TERPILIH").required("KATEGORI PRODUK BERMASALAH"),
+        price: number().min(1, "HARGA PRODUK > 1").required("HARGA PRODUK BERMASALAH"),
+        category_id: number().notOneOf([NaN, null, undefined, ""], "KATEGORI PRODUK HARUS DIPILIH").oneOf(categoryId)
+            .required("KATEGORI PRODUK BERMASALAH"),
     }).required();
 
     const { register, handleSubmit, setValue, formState: { errors } } = useForm({
@@ -52,7 +62,7 @@ export default function FormProducts() {
         setValue("image", dataUpdate?.image);
         setValue("price", dataUpdate?.price);
         setValue("category_id", dataUpdate?.category_id);
-    }, [dataUpdate])
+    })
 
 
     useEffect(() => {
@@ -83,7 +93,7 @@ export default function FormProducts() {
         // schema.validate(data)
         //     .then(() => console.log("success"))
         //     .catch((err) => console.log(err));
-        swallConfirmation()
+        swallConfirmation("Apakah Anda Sudah Yakin?")
             .then(() => sendRequest(data))
             .catch(() => swallPopUp("Ciee Gagal", "", "error"))
         // console.log(coba.toUpperCase())

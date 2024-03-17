@@ -1,21 +1,22 @@
 import Swal from "sweetalert2";
 
-export function swallPopUp(data, message, icon) {
-    return Swal.fire({
+export async function swallPopUp(data, message, icon) {
+    return await Swal.fire({
         title: data,
         text: message,
         icon: icon
     });
 }
 
-export async function swallConfirmation() {
+export async function swallConfirmation(title) {
     await Swal.fire({
-        title: "Do you want to save the changes?",
+        title: title,
         showConfirmButton: true,
         showDenyButton: true,
         showCancelButton: true,
-        confirmButtonText: "Save",
-        denyButtonText: `Don't Save`
+        confirmButtonText: "Ya",
+        denyButtonText: "Tidak",
+        cancelButtonText: "Batal"
     }).then((result) => {
         if (result.isDenied || result.isDismissed) {
             throw Error;

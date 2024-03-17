@@ -34,12 +34,12 @@ public class ProductsController {
         String titleSearch = request.getParameter("title");
         String categoryId = request.getParameter("category_id");
         String sortBy = request.getParameter("sort_by");
-        String sortAsc = request.getParameter("sort_asc");
+        String sortOrder = request.getParameter("sort_order");
 
         RequestParams req = new RequestParams();
         req.setTitleSearch(titleSearch);
         req.setSortBy(sortBy);
-        req.setSortAsc(sortAsc);
+        req.setSortOrder(sortOrder);
         req.setCategoryId(categoryId);
 
         List<ProductsResponse> pR = productsService.getAllProducts(req);

@@ -18,8 +18,8 @@ function handleLengthName(name) {
     }
 }
 
-function removeBarangFromCart(id, dispatch) {
-    swallConfirmation()
+function removeBarangFromCart(id, name, dispatch) {
+    swallConfirmation(`Apakah Kamu Ingin Menghapus ${name}?`)
         .then(() => {
             dispatch(deleteBarang(id));
             swallPopUp("Barang Berhasil Dihapus", "", "success");
@@ -27,12 +27,12 @@ function removeBarangFromCart(id, dispatch) {
         .catch(() => swallPopUp("Barang Tidak Jadi Dihapus", "", "info"));
 }
 
-function quantity(id, qty, dispatch) {
+function quantity(id, qty, name, dispatch) {
     return (
         <div className='flex flex-row gap-x-2 place-items-center'>
             {
                 qty == 1 ?
-                    <div className=' cursor-pointer' onClick={() => removeBarangFromCart(id, dispatch)}><FaRegTrashAlt /></div>
+                    <div className=' cursor-pointer' onClick={() => removeBarangFromCart(id, name, dispatch)}><FaRegTrashAlt /></div>
                     :
                     <div className=' cursor-pointer' onClick={() => dispatch(setQuantity({ id, increment: false }))}><FiMinusCircle /></div>
             }
@@ -54,12 +54,12 @@ export default function CheckoutCard({ name, price, qty, subTotal, id }) {
                 {toRupiah(price)}
             </div>
             <div className=' flex place-content-center'>
-                {quantity(id, qty, dispatch)}
+                {quantity(id, qty, name, dispatch)}
             </div>
             <div className=' absolute bottom-1 right-1'>
                 {toRupiah(subTotal)}
             </div>
-            <div className=' absolute top-1 right-1' onClick={() => removeBarangFromCart(id, dispatch)}>
+            <div className=' absolute top-1 right-1' onClick={() => removeBarangFromCart(id, name, dispatch)}>
                 <FaRegTrashAlt className=' cursor-pointer' />
             </div>
         </div>

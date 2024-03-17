@@ -32,13 +32,18 @@ public class ProductsServiceI implements ProductsService {
         String titleSearch = "%" + request.getTitleSearch() + "%";
         String categoryId = request.getCategoryId();
         String sortBy = request.getSortBy();
-        String sortAsc = request.getSortAsc();
+        String sortOrder = request.getSortOrder();
 
         Sort sort;
-        if (sortAsc == null) {
+        if (sortBy == null) {
             sort = Sort.by("id").ascending();
         } else {
-            sort = sortAsc.equalsIgnoreCase("true") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+            if (sortOrder == "" || sortOrder == null) {
+                sort = Sort.by(sortBy).ascending();
+
+            } else {
+                sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+            }
         }
 
         List<Products> products;
