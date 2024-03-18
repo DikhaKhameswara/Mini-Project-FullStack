@@ -44,7 +44,7 @@ export default function FormProducts() {
             .required("KATEGORI PRODUK BERMASALAH"),
     }).required();
 
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm({
+    const { register, handleSubmit, setValue, reset, resetField, formState: { errors, isSubmitSuccessful } } = useForm({
         resolver: yupResolver(schema)
     });
 
@@ -54,25 +54,27 @@ export default function FormProducts() {
     register('image');
 
     const [previewImage, setPreviewImage] = useState("");
+    const [title, setTitle] = useState("");
+    const [price, setPrice] = useState(0);
 
 
     useEffect(() => {
+        setTitle(dataUpdate?.title)
+        setPrice(dataUpdate?.price);
         setPreviewImage(dataUpdate?.image);
         setValue("title", dataUpdate?.title);
         setValue("image", dataUpdate?.image);
         setValue("price", dataUpdate?.price);
         setValue("category_id", dataUpdate?.category_id);
-    })
-
+    }, [dataUpdate])
 
     useEffect(() => {
+        setTitle(title);
+        setPrice(price);
         setPreviewImage(previewImage);
-    }, [previewImage])
-
-    function handleImage(url) {
-        setPreviewImage(url);
-        setValue("image", url);
-    }
+        setValue("price", price)
+        setValue("image", previewImage);
+    }, [title, previewImage, price])
 
     function sendRequest(data) {
         if (!id) {
@@ -88,14 +90,24 @@ export default function FormProducts() {
         }
     }
 
+    function resetInput() {
+        setTitle("");
+        setPrice(0);
+        setPreviewImage("");
+    }
+
     const onSubmitForm = (data) => {
         data = { ...data, title: data.title.toUpperCase() };
         // schema.validate(data)
         //     .then(() => console.log("success"))
         //     .catch((err) => console.log(err));
-        swallConfirmation("Apakah Anda Sudah Yakin?")
-            .then(() => sendRequest(data))
-            .catch(() => swallPopUp("Ciee Gagal", "", "error"))
+        swallConfirmation(`Apakah Anda Ingin ${id ? `Mengupdate Produk \n ${data.title}` : `Menambahkan Produk \n ${data.title} `} `)
+            .then(() => {
+                sendRequest(data);
+                resetInput();
+
+            })
+            .catch(() => swallPopUp("Proses Dibatalkan", "", "info"))
         // console.log(coba.toUpperCase())
     }
 
@@ -116,9 +128,12 @@ export default function FormProducts() {
                         <form onSubmit={handleSubmit(onSubmitForm)}>
                             <div className=' flex flex-col w-full place-content-start h-[7rem] relative'>
                                 <span className='w-[60%] text-3xl'>Nama Produk</span>
-                                <input type='text' {...register("title")}
+                                <input type='text'
+                                    {...register("title")}
                                     placeholder='Masukkan Nama Produk'
-                                    defaultValue={dataUpdate && dataUpdate.title}
+                                    // defaultValue={dataUpdate && dataUpdate.title}
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
                                     className='border-2 border-blue-300 w-full rounded-lg px-1 h-[3rem] text-xl' />
                                 <span className=" text-red-500 absolute bottom-0 right-0">{errors?.title?.message}</span>
                             </div>
@@ -126,8 +141,9 @@ export default function FormProducts() {
                                 <span className='w-[60%] text-3xl'>URL Gambar</span>
                                 <input type='text'
                                     placeholder='Masukkan URL Gambar Produk'
-                                    defaultValue={dataUpdate && dataUpdate.image}
-                                    onChange={(e) => handleImage(e.target.value)}
+                                    // defaultValue={dataUpdate && dataUpdate.image}
+                                    value={previewImage}
+                                    onChange={(e) => setPreviewImage(e.target.value)}
                                     className='border-2 border-blue-300 w-full rounded-lg px-1 h-[3rem] text-xl' />
                                 <span className=" text-red-500 absolute bottom-0 right-0">{errors?.image?.message}</span>
                             </div>
@@ -140,8 +156,9 @@ export default function FormProducts() {
                                     // onChange={tesss}
                                     placeholder="Masukkan Harga Produk"
                                     decimalsLimit={0}
-                                    defaultValue={dataUpdate && dataUpdate?.price}
-                                    onValueChange={(value, names, values) => setValue("price", values.float)}
+                                    value={price}
+                                    // defaultValue={dataUpdate && dataUpdate?.price}
+                                    onValueChange={(value, names, values) => setPrice(values.float)}
                                     className='border-2 border-blue-300 w-full rounded-lg px-1 h-[3rem] text-xl'
                                 />
                                 <span className=" text-red-500 absolute bottom-0 right-0">{errors?.price?.message}</span>

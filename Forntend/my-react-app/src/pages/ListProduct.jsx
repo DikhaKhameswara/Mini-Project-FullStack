@@ -39,10 +39,17 @@ export default function ListProduct() {
                     <Button>Back</Button>
                 </div>
             </div>
-            <div className=' text-lg right-10 border-4 w-fit rounded-2xl' onClick={() => navigate("/formproduk")}>
-                <Button logo={<FaPlus />}>
-                    <span>Tambah Produk</span>
-                </Button>
+            <div className=' relative'>
+                <div className=' text-lg right-10 border-4 w-fit rounded-2xl' onClick={() => navigate("/formproduk")}>
+                    <Button logo={<FaPlus />}>
+                        <span>Tambah Produk</span>
+                    </Button>
+                </div>
+                <div className=' absolute bottom-0 right-3 w-fit' onClick={() => navigate("/listkategori")}>
+                    <Button>
+                        List Kategori
+                    </Button>
+                </div>
             </div>
             <div className=' flex place-content-center'>
                 {

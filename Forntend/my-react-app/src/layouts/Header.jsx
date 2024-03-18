@@ -12,7 +12,7 @@ export default function Header() {
             <div className='text-5xl font-extrabold'>
                 LYR Team PC
             </div>
-            <div className=' flex gap-x-7'>
+            <div className=' flex gap-x-7 select-none'>
                 <div onClick={() => navigate("/admin")}>
                     <Button children={"Admin"} logo={<SiAdminer />} />
                 </div>

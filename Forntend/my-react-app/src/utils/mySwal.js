@@ -12,10 +12,8 @@ export async function swallConfirmation(title) {
     await Swal.fire({
         title: title,
         showConfirmButton: true,
-        showDenyButton: true,
         showCancelButton: true,
         confirmButtonText: "Ya",
-        denyButtonText: "Tidak",
         cancelButtonText: "Batal"
     }).then((result) => {
         if (result.isDenied || result.isDismissed) {

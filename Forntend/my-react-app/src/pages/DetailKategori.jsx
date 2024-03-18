@@ -15,7 +15,7 @@ export default function DetailKategori() {
     return (isLoading ? "" :
         <div className=' flex flex-col m-5 gap-y-3 w-full'>
             <div className=' relative text-5xl flex place-content-center'>
-                Detail Produk
+                Detail Kategori
                 <div className=' absolute text-lg right-10' onClick={() => navigate("/listkategori")}>
                     <Button>
                         Back

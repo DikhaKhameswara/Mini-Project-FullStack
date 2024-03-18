@@ -50,9 +50,9 @@ export default function FormCategory() {
         // schema.validate(data)
         //     .then(() => console.log("success"))
         //     .catch((err) => console.log(err));
-        swallConfirmation("Apakah Anda Sudah Yakin?")
+        swallConfirmation(`Apakah Anda Ingin ${id ? `Mengupdate Kategori \n ${data.name}` : `Menambahkan Kategori \n ${data.name} `} `)
             .then(() => sendRequest(data))
-            .catch(() => swallPopUp("Ciee Gagal", "", "error"))
+            .catch(() => swallPopUp("Proses Dibatalkan", "", "info"))
         // console.log(coba.toUpperCase())
     }
 
