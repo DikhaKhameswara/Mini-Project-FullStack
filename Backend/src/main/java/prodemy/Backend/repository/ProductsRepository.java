@@ -13,12 +13,12 @@ import prodemy.Backend.model.Products;
 public interface ProductsRepository extends JpaRepository<Products, Long> {
 
     @Nullable
-    List<Products> findByTitleLikeAndCategory_CategoryId(@Nullable String title, Long categoryId,
+    List<Products> findByTitleLikeAndCategory_Id(@Nullable String title, Long categoryId,
             Sort sort);
 
     @Nullable
     List<Products> findByTitleLike(@Nullable String title, Sort sort);
 
-    List<Products> findByCategory_CategoryId(Long categoryId, Sort sort);
+    List<Products> findByCategory_Id(Long categoryId, Sort sort);
 
 }

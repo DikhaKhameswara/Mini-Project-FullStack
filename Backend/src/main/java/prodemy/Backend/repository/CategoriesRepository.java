@@ -8,4 +8,6 @@ import prodemy.Backend.model.Categories;
 @Repository
 public interface CategoriesRepository extends JpaRepository<Categories, Long> {
 
+    Categories findByName(String name);
+
 }

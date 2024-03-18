@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AddCategoryRequest {
 
-    private Long categoryId;
     private String name;
 }

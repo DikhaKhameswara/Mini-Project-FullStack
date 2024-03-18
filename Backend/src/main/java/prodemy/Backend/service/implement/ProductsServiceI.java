@@ -50,9 +50,9 @@ public class ProductsServiceI implements ProductsService {
         if (categoryId != null) {
             Long cId = Long.valueOf(categoryId);
             if (titleSearch.equalsIgnoreCase("%null%")) {
-                products = productsRepository.findByCategory_CategoryId(cId, sort);
+                products = productsRepository.findByCategory_Id(cId, sort);
             } else {
-                products = productsRepository.findByTitleLikeAndCategory_CategoryId(titleSearch, cId, sort);
+                products = productsRepository.findByTitleLikeAndCategory_Id(titleSearch, cId, sort);
             }
         } else if (titleSearch.equalsIgnoreCase("%null%")) {
             products = productsRepository.findAll(sort);
@@ -67,8 +67,8 @@ public class ProductsServiceI implements ProductsService {
             p.setTitle(product.getTitle());
             p.setImage(product.getImage());
             p.setPrice(product.getPrice());
-            p.setCategory_id(product.getCategory().getCategoryId());
-            p.setCategory_name(product.getCategory().getCategoryName());
+            p.setCategory_id(product.getCategory().getId());
+            p.setCategory_name(product.getCategory().getName());
 
             pR.add(p);
         }
@@ -88,8 +88,8 @@ public class ProductsServiceI implements ProductsService {
         pR.setTitle(product.getTitle());
         pR.setImage(product.getImage());
         pR.setPrice(product.getPrice());
-        pR.setCategory_id(product.getCategory().getCategoryId());
-        pR.setCategory_name(product.getCategory().getCategoryName());
+        pR.setCategory_id(product.getCategory().getId());
+        pR.setCategory_name(product.getCategory().getName());
         return pR;
     }
 

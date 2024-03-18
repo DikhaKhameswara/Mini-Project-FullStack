@@ -25,10 +25,10 @@ public class Categories {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long categoryId;
+    private Long id;
 
     @Column(name = "NAME")
-    private String categoryName;
+    private String name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL)
     private List<Products> products;
