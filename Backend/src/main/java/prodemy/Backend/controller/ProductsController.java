@@ -1,6 +1,8 @@
 package prodemy.Backend.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,12 +15,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import prodemy.Backend.model.request.AddUpdateProductRequest;
-import prodemy.Backend.model.request.RequestParams;
 import prodemy.Backend.model.response.ProductsResponse;
 import prodemy.Backend.model.response.ResponseSuccess;
+import prodemy.Backend.service.CategoriesService;
 import prodemy.Backend.service.ProductsService;
 
 @RestController
@@ -28,30 +31,46 @@ public class ProductsController {
     @Autowired
     ProductsService productsService;
 
+    @Autowired
+    CategoriesService categoriesService;
+
     @GetMapping("/listproduct")
     public ResponseEntity<List<ProductsResponse>> getAllProducts(HttpServletRequest request) {
 
         String titleSearch = request.getParameter("title");
-        String categoryId = request.getParameter("category_id");
         String sortBy = request.getParameter("sort_by");
         String sortOrder = request.getParameter("sort_order");
+        String cId = request.getParameter("category_id");
 
-        RequestParams req = new RequestParams();
-        req.setTitleSearch(titleSearch);
-        req.setSortBy(sortBy);
-        req.setSortOrder(sortOrder);
-        req.setCategoryId(categoryId);
-
-        List<ProductsResponse> pR = productsService.getAllProducts(req);
+        List<ProductsResponse> pR = new ArrayList<>();
+        if (cId != null) {
+            try {
+                Long categoryId = Long.valueOf(request.getParameter("category_id"));
+                pR = categoriesService.getAllProductsByCategoryId(categoryId);
+            } catch (NumberFormatException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "KATEGORI ID BUKAN NUMERIK");
+            }
+        } else {
+            pR = productsService.getAllProducts(titleSearch, sortBy, sortOrder);
+        }
 
         return new ResponseEntity<List<ProductsResponse>>(pR, HttpStatus.OK);
     }
 
     @GetMapping("/detailproduct/{id}")
-    public ResponseEntity<ProductsResponse> getDetailProduct(@PathVariable Long id) {
+    public ResponseEntity getDetailProduct(@PathVariable Long id) {
 
-        ProductsResponse pR = productsService.getDetailsProduct(id);
-        return new ResponseEntity<ProductsResponse>(pR, HttpStatus.OK);
+        ProductsResponse pR = new ProductsResponse();
+        try {
+            pR = productsService.getDetailsProduct(id);
+        } catch (NoSuchElementException e) {
+            // TODO: handle exception
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+        return new ResponseEntity<>(pR, HttpStatus.OK);
     }
 
     @PostMapping("/addproduct")

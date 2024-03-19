@@ -14,8 +14,10 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import prodemy.Backend.model.entity.Categories;
+import prodemy.Backend.model.entity.Products;
 import prodemy.Backend.model.request.AddCategoryRequest;
 import prodemy.Backend.model.response.CategoriesResponse;
+import prodemy.Backend.model.response.ProductsResponse;
 import prodemy.Backend.repository.CategoriesRepository;
 import prodemy.Backend.service.CategoriesService;
 
@@ -28,6 +30,41 @@ public class CategoriesServiceI implements CategoriesService {
 
     @Autowired
     private Validator validator;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductsResponse> getAllProductsByCategoryId(Long id) {
+
+        Categories categories = new Categories();
+        List<ProductsResponse> pRList = new ArrayList<>();
+
+        try {
+            categories = cRepository.findById(id).get();
+        } catch (NoSuchElementException e) {
+            return pRList;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gagal");
+        }
+
+        if (categories.getProducts().size() == 0) {
+            return pRList;
+        }
+
+        for (Products products : categories.getProducts()) {
+            ProductsResponse pR = new ProductsResponse();
+            pR.setId(products.getId());
+            pR.setImage(products.getImage());
+            pR.setPrice(products.getPrice());
+            pR.setTitle(products.getTitle());
+            pR.setCategory_id(id);
+            pR.setCategory_name(categories.getName());
+
+            pRList.add(pR);
+        }
+
+        return pRList;
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -50,14 +87,9 @@ public class CategoriesServiceI implements CategoriesService {
     @Override
     @Transactional(readOnly = true)
     public CategoriesResponse getCategoriesById(Long id) {
-        Categories category = new Categories();
-        CategoriesResponse cR = new CategoriesResponse();
 
-        try {
-            category = cRepository.findById(id).get();
-        } catch (NoSuchElementException e) {
-            return cR;
-        }
+        Categories category = cRepository.findById(id).get();
+        CategoriesResponse cR = new CategoriesResponse();
 
         cR.setCategory_id(category.getId());
         cR.setCategory_name(category.getName());

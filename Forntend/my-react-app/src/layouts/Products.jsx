@@ -14,7 +14,7 @@ export default function Products() {
     const [c_Id, setC_Id] = useState("");
     const [title, setTitle] = useState("");
     const [sortBy, setSortBy] = useState("");
-    const [sortOrder, setSortOrder] = useState("desc");
+    const [sortOrder, setSortOrder] = useState("asc");
     const [query, setQuery] = useState("");
 
     const [q2, setQ2] = useState({
@@ -41,7 +41,6 @@ export default function Products() {
             setC_Id(c_Id);
             setQuery(`?category_id=${c_Id}`);
         }
-
     }, [c_Id])
 
     useEffect(() => {
@@ -55,9 +54,6 @@ export default function Products() {
             if (sortBy != "") {
                 setQuery(`?title=${title}&sort_by=${sortBy}&sort_order=${sortOrder}`)
             }
-            else {
-                setQuery(`?title=${title}`)
-            }
         }
     }, [title])
 
@@ -65,7 +61,6 @@ export default function Products() {
         setC_Id("");
         if (sortBy == "") {
             setSortBy("")
-            setSortOrder("")
         }
         else {
             setSortBy(sortBy);
@@ -96,11 +91,11 @@ export default function Products() {
     function clearQuery() {
         setC_Id("");
         setSortBy("")
-        setSortOrder("");
+        setSortOrder("asc");
         setTitle("");
         setQuery("");
     }
-
+    console.log(query)
     return (categories == undefined ? "" :
         <div className=' h-full flex flex-col gap-y-2'>
             <div className=' text-lg flex place-content-between'>

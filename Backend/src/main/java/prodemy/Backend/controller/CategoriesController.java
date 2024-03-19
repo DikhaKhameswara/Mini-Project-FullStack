@@ -1,6 +1,7 @@
 package prodemy.Backend.controller;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import prodemy.Backend.model.request.AddCategoryRequest;
 import prodemy.Backend.model.response.CategoriesResponse;
@@ -34,8 +36,16 @@ public class CategoriesController {
     }
 
     @GetMapping("/detailcategory/{id}")
-    public ResponseEntity<CategoriesResponse> getDetailCategory(@PathVariable Long id) {
-        CategoriesResponse cR = cService.getCategoriesById(id);
+    public ResponseEntity getDetailCategory(@PathVariable Long id) {
+        CategoriesResponse cR = new CategoriesResponse();
+        try {
+            cR = cService.getCategoriesById(id);
+        } catch (NoSuchElementException e) {
+            // TODO: handle exception
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
         return new ResponseEntity<CategoriesResponse>(cR, HttpStatus.OK);
     }
 

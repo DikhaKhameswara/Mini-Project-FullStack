@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import prodemy.Backend.model.entity.Categories;
 import prodemy.Backend.model.entity.Products;
 import prodemy.Backend.model.request.AddUpdateProductRequest;
-import prodemy.Backend.model.request.RequestParams;
 import prodemy.Backend.model.response.ProductsResponse;
 import prodemy.Backend.repository.CategoriesRepository;
 import prodemy.Backend.repository.ProductsRepository;
@@ -41,46 +40,62 @@ public class ProductsServiceI implements ProductsService {
 
     @Override
     @Transactional
-    public List<ProductsResponse> getAllProducts(RequestParams request) {
-
-        String titleSearch = "%" + request.getTitleSearch() + "%";
-        String categoryId = request.getCategoryId();
-        String sortBy = request.getSortBy();
-        String sortOrder = request.getSortOrder();
-
-        Sort sort;
-        if (sortBy == null) {
-            sort = Sort.by("id").ascending();
-        } else {
-            if (sortOrder == "" || sortOrder == null) {
-                sort = Sort.by(sortBy).ascending();
-
-            } else {
-                sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-            }
-        }
-
-        List<Products> products = new ArrayList<>();
-        try {
-            if (categoryId != null) {
-                Long cId = Long.valueOf(categoryId);
-                if (titleSearch.equalsIgnoreCase("%null%")) {
-                    products = productsRepository.findByCategory_Id(cId, sort).orElse(products);
-                } else {
-                    products = productsRepository.findByTitleLikeAndCategory_Id(titleSearch, cId, sort)
-                            .orElse(products);
-                }
-            } else if (titleSearch.equalsIgnoreCase("%null%")) {
-                products = productsRepository.findAll(sort);
-            } else {
-                products = productsRepository.findByTitleLike(titleSearch, sort).orElse(products);
-            }
-        } catch (Exception e) {
-            // TODO
-            System.out.println(e);
-        }
+    public List<ProductsResponse> getAllProducts(String titleSearch, String sortBy, String sortOrder) {
 
         List<ProductsResponse> pR = new ArrayList<>();
+
+        List<Products> products = new ArrayList<>();
+
+        Sort sort;
+        if (sortBy != null) {
+            if (sortBy.equalsIgnoreCase("title") || sortBy.equalsIgnoreCase("price")) {
+                if (sortOrder.equalsIgnoreCase("asc") || sortOrder.equalsIgnoreCase("desc")) {
+                    sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
+                            : Sort.by(sortBy).descending();
+                    if (titleSearch == null) {
+                        products = productsRepository.findAll(sort);
+                    } else {
+                        titleSearch = "%" + titleSearch + "%";
+                        products = productsRepository.findByTitleLike(titleSearch, sort).orElse(products);
+                    }
+                } else {
+                    return pR;
+                }
+            } else {
+                return pR;
+            }
+
+        } else {
+            products = productsRepository.findAll();
+
+            if (products.size() == 0) {
+                return pR;
+            }
+        }
+
+        // titleSearch = "%" + titleSearch + "%";
+
+        // try {
+        // if (categoryId != null) {
+        // Long cId = Long.valueOf(categoryId);
+        // if (titleSearch.equalsIgnoreCase("%null%")) {
+        // products = productsRepository.findByCategory_Id(cId, sort).orElse(products);
+        // } else {
+        // products = productsRepository.findByTitleLikeAndCategory_Id(titleSearch, cId,
+        // sort)
+        // .orElse(products);
+        // }
+        // } else if (titleSearch.equalsIgnoreCase("%null%")) {
+        // products = productsRepository.findAll(sort);
+        // } else {
+        // products = productsRepository.findByTitleLike(titleSearch,
+        // sort).orElse(products);
+        // }
+        // } catch (Exception e) {
+        // // TODO
+        // System.out.println(e);
+        // }
+
         for (Products product : products) {
             ProductsResponse p = new ProductsResponse();
             p.setId(product.getId());
@@ -99,14 +114,15 @@ public class ProductsServiceI implements ProductsService {
     @Override
     @Transactional
     public ProductsResponse getDetailsProduct(Long id) {
-        Products product = new Products();
+        // Products product = new Products();
         ProductsResponse pR = new ProductsResponse();
 
-        try {
-            product = productsRepository.findById(id).get();
-        } catch (NoSuchElementException e) {
-            return pR;
-        }
+        Products product = productsRepository.findById(id).get();
+        // try {
+        // product = productsRepository.findById(id).get();
+        // } catch (NoSuchElementException e) {
+        // throw new NoSuchElementException();
+        // }
 
         pR.setId(product.getId());
         pR.setTitle(product.getTitle());

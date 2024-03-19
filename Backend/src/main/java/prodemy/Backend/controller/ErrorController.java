@@ -8,7 +8,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.validation.ConstraintViolationException;
-import prodemy.Backend.model.request.ErrorRequest;
 
 @RestControllerAdvice
 public class ErrorController {
@@ -24,8 +23,8 @@ public class ErrorController {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorRequest> typeMismatchEntity() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorRequest.builder().build());
+    public ResponseEntity<String> typeMismatchEntity(MethodArgumentTypeMismatchException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage().toUpperCase());
     }
 
     // @ExceptionHandler(NoSuchElementException.class)
