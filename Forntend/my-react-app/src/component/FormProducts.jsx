@@ -39,7 +39,7 @@ export default function FormProducts() {
     const schema = object().shape({
         title: string().defined().required("NAMA PRODUK BERMASALAH"),
         image: string().url().required("URL GAMBAR BERMASALAH"),
-        price: number().min(1, "HARGA PRODUK > 1").required("HARGA PRODUK BERMASALAH"),
+        price: number().min(1, "HARGA PRODUK BERMASALAH").required("HARGA PRODUK BERMASALAH"),
         category_id: number().notOneOf([NaN, null, undefined, ""], "KATEGORI PRODUK HARUS DIPILIH").oneOf(categoryId)
             .required("KATEGORI PRODUK BERMASALAH"),
     }).required();
@@ -80,7 +80,7 @@ export default function FormProducts() {
         if (!id) {
             axiosBackend.post('/addproduct', data)
                 .then(() => swallPopUp("Data Berhasil Ditambahkan", "", "success"))
-                .catch(() => swallPopUp("Pengiriman Gagal", "Data Tidak Tersimpan", "error"))
+                .catch((err) => swallPopUp("Data Tidak Tersimpan", err.response?.data, "error"))
         }
         else {
             axiosBackend.put(`/updateproduct/${id}`, data)
@@ -105,7 +105,6 @@ export default function FormProducts() {
             .then(() => {
                 sendRequest(data);
                 resetInput();
-
             })
             .catch(() => swallPopUp("Proses Dibatalkan", "", "info"))
         // console.log(coba.toUpperCase())

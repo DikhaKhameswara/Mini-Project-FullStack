@@ -17,15 +17,16 @@ export default function RiwayatTransaksi() {
     const navigate = useNavigate();
 
     return (isLoading ? "" :
-        <div className=' p-5 relative'>
-            <div className=' absolute' onClick={() => navigate("/")}>
-                <Button>
-                    Back
-                </Button>
-            </div>
-            <div className=' text-5xl mb-[5rem] flex place-content-center'>
-                Riwayat Transaksi
-                <hr />
+        <div className=' p-5 relative flex flex-col'>
+            <div className=' relative border-b-4 border-red-700 p-2 mb-[2rem]'>
+                <div className=' absolute' onClick={() => navigate("/")}>
+                    <Button>
+                        Back
+                    </Button>
+                </div>
+                <div className=' text-5xl flex place-content-center'>
+                    Riwayat Transaksi
+                </div>
             </div>
             <div className=' flex place-content-center'>
                 <table className="text-left w-full">

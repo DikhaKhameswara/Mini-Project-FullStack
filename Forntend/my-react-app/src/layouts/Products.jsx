@@ -79,8 +79,6 @@ export default function Products() {
         }
     }, [sortBy, sortOrder])
 
-    console.log(query)
-
     function handleSearchVal(event) {
         event.preventDefault();
         setTitle(event.target.value);

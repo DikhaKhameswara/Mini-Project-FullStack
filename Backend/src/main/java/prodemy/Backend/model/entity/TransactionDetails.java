@@ -1,4 +1,4 @@
-package prodemy.Backend.model;
+package prodemy.Backend.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "TRANSACTION_DETAIL")
+@Table(name = "TRANSACTION_DETAILS")
 public class TransactionDetails {
 
     @Id

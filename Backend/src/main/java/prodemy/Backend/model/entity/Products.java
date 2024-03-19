@@ -1,4 +1,6 @@
-package prodemy.Backend.model;
+package prodemy.Backend.model.entity;
+
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -9,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,4 +40,7 @@ public class Products {
     @ManyToOne(targetEntity = Categories.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "CATEGORY_ID")
     private Categories category;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productsId")
+    private List<TransactionDetails> transactionDetails;
 }

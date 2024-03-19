@@ -2,11 +2,18 @@ package prodemy.Backend.service.implement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-import prodemy.Backend.model.Categories;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import prodemy.Backend.model.entity.Categories;
 import prodemy.Backend.model.request.AddCategoryRequest;
 import prodemy.Backend.model.response.CategoriesResponse;
 import prodemy.Backend.repository.CategoriesRepository;
@@ -19,7 +26,11 @@ public class CategoriesServiceI implements CategoriesService {
     @Autowired
     private CategoriesRepository cRepository;
 
+    @Autowired
+    private Validator validator;
+
     @Override
+    @Transactional(readOnly = true)
     public List<CategoriesResponse> getAllCategories() {
         List<Categories> categories = cRepository.findAll();
 
@@ -37,9 +48,17 @@ public class CategoriesServiceI implements CategoriesService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoriesResponse getCategoriesById(Long id) {
-        Categories category = cRepository.findById(id).orElseThrow();
+        Categories category = new Categories();
         CategoriesResponse cR = new CategoriesResponse();
+
+        try {
+            category = cRepository.findById(id).get();
+        } catch (NoSuchElementException e) {
+            return cR;
+        }
+
         cR.setCategory_id(category.getId());
         cR.setCategory_name(category.getName());
         cR.setTotal_products(Long.valueOf(category.getProducts().size()));
@@ -47,17 +66,30 @@ public class CategoriesServiceI implements CategoriesService {
     }
 
     @Override
+    @Transactional
     public void addCategory(AddCategoryRequest request) {
 
         // Categories categories = cRepository.findByName(request.getName());
         Categories newCategories = new Categories();
+
+        Set<ConstraintViolation<Object>> validate = validator.validate(request);
+
+        if (validate.size() != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "NAMA KATEGORI TIDAK BOLEH KOSONG");
+        }
         newCategories.setName(request.getName());
         cRepository.save(newCategories);
     }
 
     @Override
+    @Transactional
     public void updateCategory(Long id, AddCategoryRequest request) {
-        Categories update = cRepository.getReferenceById(id);
+
+        Categories update = cRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "ID KATEGORI TIDAK DAPAT DITEMUKAN"));
+
         update.setName(request.getName());
         cRepository.save(update);
     }
@@ -65,7 +97,11 @@ public class CategoriesServiceI implements CategoriesService {
     @Override
     public void deleteCategory(Long id) {
 
-        Categories categories = cRepository.getReferenceById(id);
+        Categories categories = cRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID KATEGORI TIDAK TERDAFTAR"));
+        if (categories.getProducts().size() != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "KATEGORI MASIH MEMILIKI PRODUK");
+        }
         cRepository.delete(categories);
 
     }

@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
@@ -28,7 +28,7 @@ export default function FormCategory() {
         name: string().defined().required("NAMA KATEGORI BERMASALAH")
     }).required();
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm({
         resolver: yupResolver(schema)
     });
 
@@ -45,13 +45,27 @@ export default function FormCategory() {
         }
     }
 
+    const [title, setTitle] = useState("");
+
+    useEffect(() => {
+        setTitle(dataUpdate?.category_name)
+    }, [dataUpdate])
+
+    useEffect(() => {
+        setTitle(title)
+    }, [title])
+
     const onSubmitForm = (data) => {
         data = { name: data.name.toUpperCase() };
         // schema.validate(data)
         //     .then(() => console.log("success"))
         //     .catch((err) => console.log(err));
         swallConfirmation(`Apakah Anda Ingin ${id ? `Mengupdate Kategori \n ${data.name}` : `Menambahkan Kategori \n ${data.name} `} `)
-            .then(() => sendRequest(data))
+            .then(() => {
+                sendRequest(data);
+                reset();
+                setTitle("")
+            })
             .catch(() => swallPopUp("Proses Dibatalkan", "", "info"))
         // console.log(coba.toUpperCase())
     }
@@ -75,7 +89,9 @@ export default function FormCategory() {
                                 <span className='w-[60%] text-3xl'>Nama Kategori</span>
                                 <input type='text' {...register("name")}
                                     placeholder='Masukkan Nama Kategori'
-                                    defaultValue={dataUpdate && dataUpdate.category_name}
+                                    // defaultValue={dataUpdate && dataUpdate.category_name}
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
                                     className='border-2 border-blue-300 w-full rounded-lg px-1 h-[3rem] text-xl' />
                                 <span className=" text-red-500 absolute bottom-0 right-0">{errors?.name?.message}</span>
                             </div>

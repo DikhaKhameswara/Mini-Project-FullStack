@@ -26,7 +26,7 @@ export default function ListProduct() {
                         swallPopUp("Data Berhasil Dihapus", "", "success");
                         mutate();
                     })
-                    .catch(() => swallPopUp("Data Gagal Dihapus", "", "error"))
+                    .catch((err) => swallPopUp("Data Gagal Dihapus", err.response?.data, "error"))
             })
             .catch(() => swallPopUp("Data Tidak Jadi Dihapus", "", "info"))
 

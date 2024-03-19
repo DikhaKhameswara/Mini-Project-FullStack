@@ -1,11 +1,11 @@
-package prodemy.Backend.model;
+package prodemy.Backend.model.entity;
 
+import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,18 +19,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "CATEGORIES")
-public class Categories {
+@Table(name = "TRANSACTIONS")
+public class Transactions {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "NAME")
-    private String name;
+    @Column(name = "TRANSACTION_DATE")
+    private Date transactionsDate;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Products> products;
+    @Column(name = "TOTAL_AMOUNT")
+    private Long totalAmount;
 
+    @Column(name = "TOTAL_PAY")
+    private Long totalPay;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "transactionId")
+    private List<TransactionDetails> transactionDetails;
 }

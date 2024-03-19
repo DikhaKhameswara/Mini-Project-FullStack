@@ -31,8 +31,6 @@ export default function Checkout() {
             .catch(() => swallPopUp("Barang Tidak Jadi Dihapus", "", "info"));
     }
 
-    console.log(cart)
-
     return (
         <div className=' flex flex-col relative h-full w-full'>
             <div className=' text-5xl mb-[2rem] flex gap-x-2 place-items-center place-content-center h-[5rem]'>

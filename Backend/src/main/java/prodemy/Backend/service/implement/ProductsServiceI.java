@@ -2,13 +2,22 @@ package prodemy.Backend.service.implement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-import prodemy.Backend.model.Categories;
-import prodemy.Backend.model.Products;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
+import lombok.extern.slf4j.Slf4j;
+import prodemy.Backend.model.entity.Categories;
+import prodemy.Backend.model.entity.Products;
 import prodemy.Backend.model.request.AddUpdateProductRequest;
 import prodemy.Backend.model.request.RequestParams;
 import prodemy.Backend.model.response.ProductsResponse;
@@ -18,6 +27,7 @@ import prodemy.Backend.service.ProductsService;
 
 @SuppressWarnings("null")
 @Service
+@Slf4j
 public class ProductsServiceI implements ProductsService {
 
     @Autowired
@@ -26,7 +36,11 @@ public class ProductsServiceI implements ProductsService {
     @Autowired
     private CategoriesRepository categoriesRepository;
 
+    @Autowired
+    private Validator validator;
+
     @Override
+    @Transactional
     public List<ProductsResponse> getAllProducts(RequestParams request) {
 
         String titleSearch = "%" + request.getTitleSearch() + "%";
@@ -46,18 +60,24 @@ public class ProductsServiceI implements ProductsService {
             }
         }
 
-        List<Products> products;
-        if (categoryId != null) {
-            Long cId = Long.valueOf(categoryId);
-            if (titleSearch.equalsIgnoreCase("%null%")) {
-                products = productsRepository.findByCategory_Id(cId, sort);
+        List<Products> products = new ArrayList<>();
+        try {
+            if (categoryId != null) {
+                Long cId = Long.valueOf(categoryId);
+                if (titleSearch.equalsIgnoreCase("%null%")) {
+                    products = productsRepository.findByCategory_Id(cId, sort).orElse(products);
+                } else {
+                    products = productsRepository.findByTitleLikeAndCategory_Id(titleSearch, cId, sort)
+                            .orElse(products);
+                }
+            } else if (titleSearch.equalsIgnoreCase("%null%")) {
+                products = productsRepository.findAll(sort);
             } else {
-                products = productsRepository.findByTitleLikeAndCategory_Id(titleSearch, cId, sort);
+                products = productsRepository.findByTitleLike(titleSearch, sort).orElse(products);
             }
-        } else if (titleSearch.equalsIgnoreCase("%null%")) {
-            products = productsRepository.findAll(sort);
-        } else {
-            products = productsRepository.findByTitleLike(titleSearch, sort);
+        } catch (Exception e) {
+            // TODO
+            System.out.println(e);
         }
 
         List<ProductsResponse> pR = new ArrayList<>();
@@ -72,28 +92,34 @@ public class ProductsServiceI implements ProductsService {
 
             pR.add(p);
         }
+
         return pR;
     }
 
     @Override
+    @Transactional
     public ProductsResponse getDetailsProduct(Long id) {
         Products product = new Products();
+        ProductsResponse pR = new ProductsResponse();
+
         try {
             product = productsRepository.findById(id).get();
-        } catch (Exception e) {
-            // TODO: handle exception
+        } catch (NoSuchElementException e) {
+            return pR;
         }
-        ProductsResponse pR = new ProductsResponse();
+
         pR.setId(product.getId());
         pR.setTitle(product.getTitle());
         pR.setImage(product.getImage());
         pR.setPrice(product.getPrice());
         pR.setCategory_id(product.getCategory().getId());
         pR.setCategory_name(product.getCategory().getName());
+
         return pR;
     }
 
     @Override
+    @Transactional
     public void addProduct(AddUpdateProductRequest request) {
         Products products = new Products();
 
@@ -101,8 +127,15 @@ public class ProductsServiceI implements ProductsService {
 
         try {
             cat = categoriesRepository.findById(request.getCategory_id()).get();
-        } catch (Exception e) {
+        } catch (NoSuchElementException e) {
             // TODO: handle exception
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID Kategori Tidak Ditemukan");
+        }
+
+        Set<ConstraintViolation<AddUpdateProductRequest>> cViolations = validator.validate(request);
+
+        if (cViolations.size() != 0) {
+            throw new ConstraintViolationException(cViolations);
         }
 
         products.setTitle(request.getTitle());
@@ -110,20 +143,34 @@ public class ProductsServiceI implements ProductsService {
         products.setPrice(request.getPrice());
         products.setCategory(cat);
 
-        productsRepository.save(products);
+        try {
+            productsRepository.save(products);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
 
     }
 
     @Override
+    @Transactional
     public void updateproduct(Long id, AddUpdateProductRequest request) {
 
         Categories cat = new Categories();
         Products products = new Products();
+
         try {
             cat = categoriesRepository.findById(request.getCategory_id()).get();
             products = productsRepository.getReferenceById(id);
-        } catch (Exception e) {
+        } catch (NoSuchElementException e) {
             // TODO: handle exception
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "ID Kategori Tidak Ditemukan");
+        }
+
+        Set<ConstraintViolation<AddUpdateProductRequest>> cViolations = validator.validate(request);
+
+        if (cViolations.size() != 0) {
+            throw new ConstraintViolationException(cViolations);
         }
 
         products.setTitle(request.getTitle());
@@ -136,17 +183,36 @@ public class ProductsServiceI implements ProductsService {
     }
 
     @Override
+    @Transactional
     public void deleteProduct(Long id) {
 
-        Products products = new Products();
-
-        try {
-            products = productsRepository.getReferenceById(id);
-        } catch (Exception e) {
-            // TODO: handle exception
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID TIDAK BOLEH KOSONG");
         }
-        products.setCategory(null);
+
+        Products products = productsRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "ID PRODUK TIDAK DAPAT DITEMUKAN"));
+
+        if (products.getTransactionDetails().size() != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "PRODUK SUDAH TERCANTUM DI TRANSAKSI");
+        }
+
         productsRepository.delete(products);
+        // try {
+        // products = productsRepository.getReferenceById(id);
+        // } catch (Exception e) {
+        // // TODO: handle exception
+        // }
+
+        // products.setCategory(null);
+        // try {
+        // productsRepository.delete(products);
+        // } catch (Exception e) {
+        // // TODO: handle exception
+        // }
     }
 
 }
