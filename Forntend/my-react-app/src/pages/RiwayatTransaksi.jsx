@@ -29,20 +29,20 @@ export default function RiwayatTransaksi() {
                 </div>
             </div>
             <div className=' flex place-content-center'>
-                <table className="text-left w-full">
-                    <thead className="bg-black flex text-white w-full">
-                        <tr className="flex w-full mb-4 text-2xl">
-                            <th className="p-4 w-[22%]">Tanggal Transaksi</th>
-                            <th className="p-4 w-[22%]">ID Transaksi</th>
-                            <th className="p-4 w-[22%]">Total Harga</th>
-                            <th className="p-4 w-[22%]">Total Bayar</th>
+                <table className="text-left w-full overflow-y-scroll relative">
+                    <thead className="bg-black flex text-white w-full relative">
+                        <tr className="flex w-full place-items-center h-[5rem] text-2xl">
+                            <th className="p-4 w-[22%] border-r-2 border-white">Tanggal Transaksi</th>
+                            <th className="p-4 w-[22%] border-r-2 border-white">ID Transaksi</th>
+                            <th className="p-4 w-[22%] border-r-2 border-white">Total Harga</th>
+                            <th className="p-4 w-[22%] border-r-2 border-white">Total Bayar</th>
                             <th className="p-4 w-[12%]">Action</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-grey-light flex flex-col items-center justify-between overflow-auto w-full h-[60vh]">
+                    <tbody className=" flex flex-col items-center w-full max-h-[60vh] overflow-y-scroll">
                         {
                             data.map((item) => (
-                                <tr key={item.transaction_id} className=' flex w-full mb-4'>
+                                <tr key={item.transaction_id} className=' flex w-full text-xl items-center border-b-2 h-[5rem] border-red-700'>
                                     <td className=' p-4 w-[22%]'>{handleDate(item.transaction_date)}</td>
                                     <td className=' p-4 w-[22%]'>{item.transaction_id}</td>
                                     <td className=' p-4 w-[22%]'>{toRupiah(item.total_amount)}</td>

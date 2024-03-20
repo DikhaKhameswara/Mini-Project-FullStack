@@ -1,6 +1,7 @@
 package prodemy.Backend.controller;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import prodemy.Backend.model.request.AddTransactionsRequest;
 import prodemy.Backend.model.response.DetailsTransactionResponse;
@@ -34,7 +36,16 @@ public class TransactionsController {
 
     @GetMapping("/detailtransaction/{id}")
     public ResponseEntity<DetailsTransactionResponse> transactionsById(@PathVariable Long id) {
-        DetailsTransactionResponse tR = tService.getTransactionsById(id);
+        DetailsTransactionResponse tR = new DetailsTransactionResponse();
+
+        try {
+            tR = tService.getTransactionsById(id);
+        } catch (NoSuchElementException e) { // HANDLER IF tR VALUE IS NULL
+            // TODO: handle exception
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) { // HANDLER FOR GLOBAL CASE EXCEPTION
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
 
         return new ResponseEntity<DetailsTransactionResponse>(tR, HttpStatus.OK);
     }

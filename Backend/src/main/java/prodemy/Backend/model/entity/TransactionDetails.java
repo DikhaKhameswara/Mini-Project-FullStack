@@ -31,9 +31,9 @@ public class TransactionDetails {
 
     @ManyToOne(targetEntity = Transactions.class)
     @JoinColumn(name = "TRANSACTION_ID")
-    private Transactions transactionId;
+    private Transactions transaction;
 
     @ManyToOne(targetEntity = Products.class)
     @JoinColumn(name = "PRODUCTS_ID")
-    private Products productsId;
+    private Products product;
 }

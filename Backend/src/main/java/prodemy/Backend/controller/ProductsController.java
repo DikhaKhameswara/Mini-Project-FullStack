@@ -64,9 +64,9 @@ public class ProductsController {
         try {
             pR = productsService.getDetailsProduct(id);
         } catch (NoSuchElementException e) {
-            // TODO: handle exception
             return new ResponseEntity<>(HttpStatus.OK);
-
+        } catch (NullPointerException e) {
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -74,8 +74,7 @@ public class ProductsController {
     }
 
     @PostMapping("/addproduct")
-    public ResponseEntity<ResponseSuccess> postAddProduct(@RequestBody AddUpdateProductRequest request,
-            HttpServletRequest request2) {
+    public ResponseEntity<ResponseSuccess> postAddProduct(@RequestBody AddUpdateProductRequest request) {
 
         productsService.addProduct(request);
 

@@ -35,6 +35,6 @@ public class Transactions {
     @Column(name = "TOTAL_PAY")
     private Long totalPay;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "transactionId")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "transaction")
     private List<TransactionDetails> transactionDetails;
 }

@@ -41,6 +41,6 @@ public class Products {
     @JoinColumn(name = "CATEGORY_ID")
     private Categories category;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "productsId")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "product")
     private List<TransactionDetails> transactionDetails;
 }
