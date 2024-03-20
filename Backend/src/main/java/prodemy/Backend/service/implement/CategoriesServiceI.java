@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import prodemy.Backend.model.entity.Categories;
 import prodemy.Backend.model.entity.Products;
@@ -38,19 +39,22 @@ public class CategoriesServiceI implements CategoriesService {
         Categories categories = new Categories();
         List<ProductsResponse> pRList = new ArrayList<>();
 
-        try {
+        try { // TRYING TO GET DATA CATEGORY BY ID FROM DATABASE
             categories = cRepository.findById(id).get();
-        } catch (NoSuchElementException e) {
+
+        } catch (NoSuchElementException e) { // HANDLING ERROR WHEN CATEGORIES VALUE IS NULL
             return pRList;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gagal");
+
+        } catch (Exception e) { // HANDLING GLOBAL ERROR
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
+        // VALIDATING IF NO PRODUCTS ON SELECTED CATEGORY
         if (categories.getProducts().size() == 0) {
             return pRList;
         }
 
+        // TRANSFORM EACH PRODUCTS TO PRODUCTS RESPONSE
         for (Products products : categories.getProducts()) {
             ProductsResponse pR = new ProductsResponse();
             pR.setId(products.getId());
@@ -63,16 +67,25 @@ public class CategoriesServiceI implements CategoriesService {
             pRList.add(pR);
         }
 
+        // RETUN PRODUCTS RESPONSE TO CONTROLLER
         return pRList;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CategoriesResponse> getAllCategories() {
+
+        // GET ALL CATEGORIES FROM DATABASE
         List<Categories> categories = cRepository.findAll();
 
         List<CategoriesResponse> cRList = new ArrayList<>();
 
+        // VALIDATING IF NO CATEGORIES GETTING
+        if (categories.size() == 0) {
+            return cRList;
+        }
+
+        // SET CATEGORIES TO CATEGORIES RESPONSE
         for (Categories c : categories) {
             CategoriesResponse cR = new CategoriesResponse();
             cR.setCategory_id(c.getId());
@@ -81,6 +94,8 @@ public class CategoriesServiceI implements CategoriesService {
 
             cRList.add(cR);
         }
+
+        // GET ALL CATEGORIES FROM DATABASE
         return cRList;
     }
 
@@ -88,12 +103,17 @@ public class CategoriesServiceI implements CategoriesService {
     @Transactional(readOnly = true)
     public CategoriesResponse getCategoriesById(Long id) {
 
+        // GET CATEGORIES BY ID FROM DATABASE
         Categories category = cRepository.findById(id).get();
+
         CategoriesResponse cR = new CategoriesResponse();
 
+        // SET CATEGORIES TO CATEGORIES RESPONSE
         cR.setCategory_id(category.getId());
         cR.setCategory_name(category.getName());
         cR.setTotal_products(Long.valueOf(category.getProducts().size()));
+
+        // RETURN CATEGORIES RESPONSE TO CONTROLLER
         return cR;
     }
 
@@ -101,40 +121,74 @@ public class CategoriesServiceI implements CategoriesService {
     @Transactional
     public void addCategory(AddCategoryRequest request) {
 
-        // Categories categories = cRepository.findByName(request.getName());
         Categories newCategories = new Categories();
 
+        // VALIDATING REQUEST CATEGORIES LIKE @NOT EMPTY
         Set<ConstraintViolation<Object>> validate = validator.validate(request);
 
-        if (validate.size() != 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "NAMA KATEGORI TIDAK BOLEH KOSONG");
+        if (validate.size() != 0) { // EXCEQUTE WHEN VALIDATION HAS ISSUE
+            throw new ConstraintViolationException(validate);
         }
+
+        // SET NAME OF NEW CATEGORY
         newCategories.setName(request.getName());
-        cRepository.save(newCategories);
+
+        try { // TRY TO SAVE NEW CATEGORY TO DATABASE
+            cRepository.save(newCategories);
+
+        } catch (Exception e) {// HANDLING GLOBAL ERROR
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @Override
     @Transactional
     public void updateCategory(Long id, AddCategoryRequest request) {
 
+        // GET CATEGORY BY ID FROM DATABASE AND HANDLING IF CATEGORY IS NULL
         Categories update = cRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "ID KATEGORI TIDAK DAPAT DITEMUKAN"));
+                                "KATEGORI TIDAK DITEMUKAN"));
 
+        // VALIDATING REQUEST CATEGORIES LIKE @NOT EMPTY
+        Set<ConstraintViolation<Object>> validate = validator.validate(request);
+
+        if (validate.size() != 0) { // EXCEQUTE WHEN VALIDATION HAS ISSUE
+            throw new ConstraintViolationException(validate);
+        }
+
+        // SET NEW NAME TO UPDATE CATEGORIES
         update.setName(request.getName());
-        cRepository.save(update);
+
+        try { // TRYING TO SAVE UPDATE CATEGORY TO DATABASE
+            cRepository.save(update);
+
+        } catch (Exception e) { // HANDLING GLOBAL ERROR
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @Override
     public void deleteCategory(Long id) {
 
+        // GETTING CATEGORIES FROM DATABASE AND HANDLING IF CATEGORY IS NOT FOUND
         Categories categories = cRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID KATEGORI TIDAK TERDAFTAR"));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "ID KATEGORI TIDAK TERDAFTAR"));
+
+        // VALIDATING IF CATEGORY HAS PRODUCTS THAT CANN'T BE REMOVED
         if (categories.getProducts().size() != 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "KATEGORI MASIH MEMILIKI PRODUK");
         }
-        cRepository.delete(categories);
+
+        try { // TRYING TO DELETE CATEGORIES
+            cRepository.delete(categories);
+
+        } catch (Exception e) { // HANDLING GLOBAL ERROR
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
 
     }
 

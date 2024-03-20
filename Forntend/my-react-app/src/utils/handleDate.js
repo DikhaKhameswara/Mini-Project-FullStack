@@ -1,6 +1,6 @@
 
 
 export function handleDate(date) {
-    return date.split("T")[0];
+    return date.split(".0")[0] + " WIB";
 
 }

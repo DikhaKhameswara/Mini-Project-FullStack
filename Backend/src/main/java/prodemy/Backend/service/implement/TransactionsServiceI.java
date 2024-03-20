@@ -58,7 +58,7 @@ public class TransactionsServiceI implements TransactionsService {
         for (Transactions t : transactions) {
             TransactionsResponse tR = new TransactionsResponse();
             tR.setTransaction_id(t.getId());
-            tR.setTransaction_date(t.getTransactionsDate());
+            tR.setTransaction_date(t.getTransactionsDate().toString());
             tR.setTotal_pay(t.getTotalPay());
             tR.setTotal_amount(t.getTotalAmount());
 
@@ -79,7 +79,7 @@ public class TransactionsServiceI implements TransactionsService {
         // SET DTO FOR RETURN VALUE
         DetailsTransactionResponse dTResponse = new DetailsTransactionResponse();
         dTResponse.setTransaction_id(t.getId());
-        dTResponse.setTransaction_date(t.getTransactionsDate());
+        dTResponse.setTransaction_date(t.getTransactionsDate().toString());
         dTResponse.setTotal_pay(t.getTotalPay());
         dTResponse.setTotal_amount(t.getTotalAmount());
 
@@ -165,8 +165,8 @@ public class TransactionsServiceI implements TransactionsService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "SUBTOTAL BERMASALAH");
             }
 
+            // SET EACH PRODUCT
             td.setProduct(product);
-
             td.setQuantity(tDetails.getQuantity());
             td.setSubtotal(tDetails.getSubtotal());
             td.setTransaction(tr);

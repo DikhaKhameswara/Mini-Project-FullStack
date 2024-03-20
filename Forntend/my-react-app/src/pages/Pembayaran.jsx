@@ -79,7 +79,7 @@ export default function Pembayaran() {
                     })
                     .catch((err) => {
                         console.log(err);
-                        swallPopUp("Error", "Pengiriman Bermasalah", "error");
+                        swallPopUp("Pembayaran Gagal", err.response?.data, "error");
                     })
             })
             .catch(() => swallPopUp("Pembayaran Dibatalkan", "", "info"));

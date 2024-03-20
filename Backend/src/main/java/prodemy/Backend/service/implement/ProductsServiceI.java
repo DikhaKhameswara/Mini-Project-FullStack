@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
-import lombok.extern.slf4j.Slf4j;
 import prodemy.Backend.model.entity.Categories;
 import prodemy.Backend.model.entity.Products;
 import prodemy.Backend.model.request.AddUpdateProductRequest;
@@ -26,7 +25,6 @@ import prodemy.Backend.service.ProductsService;
 
 @SuppressWarnings("null")
 @Service
-@Slf4j
 public class ProductsServiceI implements ProductsService {
 
     @Autowired
@@ -39,7 +37,7 @@ public class ProductsServiceI implements ProductsService {
     private Validator validator;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ProductsResponse> getAllProducts(String titleSearch, String sortBy, String sortOrder) {
 
         List<ProductsResponse> pR = new ArrayList<>();
@@ -47,28 +45,28 @@ public class ProductsServiceI implements ProductsService {
         List<Products> products = new ArrayList<>();
 
         Sort sort;
-        if (sortBy != null) {
+        if (sortBy != null) { // GET DATA FROM DATABASE WITH SORTING VALUE
             if (sortBy.equalsIgnoreCase("title") || sortBy.equalsIgnoreCase("price")) {
                 if (sortOrder.equalsIgnoreCase("asc") || sortOrder.equalsIgnoreCase("desc")) {
                     sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
                             : Sort.by(sortBy).descending();
-                    if (titleSearch == null) {
+                    if (titleSearch == null) { // GET DATA FROM DATABASE IF NO TITLE SEARCH INPUT
                         products = productsRepository.findAll(sort);
-                    } else {
+                    } else { // GET DATA FROM DATABASE WITH TITLE SEARCH
                         titleSearch = "%" + titleSearch + "%";
                         products = productsRepository.findByTitleLike(titleSearch, sort).orElse(products);
                     }
-                } else {
+                } else { // RETURN IF SORT ORDER NOT ONE OF (ASC, DESC)
                     return pR;
                 }
-            } else {
+            } else { // RETURN IF SORT BY NOT ONE OF (TITLE, PRICE)
                 return pR;
             }
 
-        } else {
+        } else { // GET ALL DATA FROM DATABASE WITHOUT SORTING
             products = productsRepository.findAll();
 
-            if (products.size() == 0) {
+            if (products.size() == 0) { // RETURN LIST PRODUCT RESPONSE IF NO PRODUCTS ON DATABASE
                 return pR;
             }
         }
@@ -89,12 +87,14 @@ public class ProductsServiceI implements ProductsService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public ProductsResponse getDetailsProduct(Long id) {
         ProductsResponse pR = new ProductsResponse();
 
+        // GET DATA FROM DATABASE BY ID
         Products product = productsRepository.findById(id).get();
 
+        // SET DTO FROM DATABASE TO PRODUCT RESPONSE
         pR.setId(product.getId());
         pR.setTitle(product.getTitle());
         pR.setImage(product.getImage());
@@ -111,30 +111,36 @@ public class ProductsServiceI implements ProductsService {
         Products products = new Products();
         Categories cat = new Categories();
 
+        // VALIDATING REQUEST LIKE @NOT EMPYTY ETC
         Set<ConstraintViolation<AddUpdateProductRequest>> cViolations = validator.validate(request);
         if (cViolations.size() != 0) {
             throw new ConstraintViolationException(cViolations);
         }
 
-        System.out.println(request);
-
-        try {
+        try { // GET DATA CATEGORY FROM DATABASE
             cat = categoriesRepository.findById(request.getCategory_id()).get();
-        } catch (IllegalArgumentException e) {
+
+        } catch (IllegalArgumentException e) { // HANDLING ERROR IF ID IS NULL
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "KATEGORI ID TIDAK BOLEH KOSONG");
-        } catch (NoSuchElementException e) {
+
+        } catch (NoSuchElementException e) { // HANDLING ERROR WHEN KATEGORI NOT FOUND
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "KATEGORI ID TIDAK DITEMUKAN");
+
+        } catch (Exception e) { // HANDLING GLOBAL ERROR
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
+        // SET DTO TO PRODUCTS BEFORE SAVE
         products.setTitle(request.getTitle().toUpperCase());
         products.setImage(request.getImage());
         products.setPrice(request.getPrice());
         products.setCategory(cat);
 
-        try {
+        try {// SAVING TO DATABASE
             productsRepository.save(products);
-        } catch (Exception e) {
-            // TODO: handle exception
+
+        } catch (Exception e) { // HANDLING GLOBAL ERROR
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
     }
@@ -146,54 +152,68 @@ public class ProductsServiceI implements ProductsService {
         Categories cat = new Categories();
         Products products = new Products();
 
+        // VALIDATING REQUEST LIKE @NOT EMPTY ETC
         Set<ConstraintViolation<AddUpdateProductRequest>> cViolations = validator.validate(request);
         if (cViolations.size() != 0) {
             throw new ConstraintViolationException(cViolations);
         }
 
-        try {
+        try { // TRY TO GET CATEGORY BY CATEGORY ID AND PRODUCTS BY PRODUCTS ID
             cat = categoriesRepository.findById(request.getCategory_id()).get();
             products = productsRepository.getReferenceById(id);
-        } catch (NoSuchElementException e) {
-            // TODO: handle exception
+
+        } catch (NoSuchElementException e) {// HANDLING ERROR WHEN CATEGORY OR PRODUCTS NOT FOUND
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "KATEGORI ID TIDAK DITEMUKAN");
+                    "DATA TIDAK DITEMUKAN");
         }
 
+        // SET DTO TO PRODUCTS BEFORE SAVE
         products.setTitle(request.getTitle());
         products.setImage(request.getImage());
         products.setPrice(request.getPrice());
         products.setCategory(cat);
 
-        productsRepository.save(products);
-
+        try { // TRY TO SAVE UPDATE PRODUCTS
+            productsRepository.save(products);
+        } catch (Exception e) { // HANDLING GLOBAL ERROR
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @Override
     @Transactional
     public void deleteProduct(Long id) {
 
+        // VALIDATING FOR ID NOT NULL
         if (id == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID TIDAK BOLEH KOSONG");
         }
 
+        // GET DATA FROM DATABASE AND HANDLING IF DATA IS NOT FOUND
         Products products = productsRepository.findById(id)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "ID PRODUK TIDAK DAPAT DITEMUKAN"));
+                                "PRODUK TIDAK DAPAT DITEMUKAN"));
 
+        // HANDLING IF PRODUCTS HAS BEEN SOLD THAT'S CANNOT BE REMOVED
         if (products.getTransactionDetails().size() != 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "PRODUK SUDAH PERNAH TERJUAL");
         }
 
+        // SET CATEGORY TO NULL
         products.setCategory(null);
-        if (products.getCategory() != null) {
+        if (products.getCategory() != null) { // HANDLING WHEN CATEGORY NOT NULL
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "PRODUK TIDAK BISA DIHAPUS");
         }
 
-        productsRepository.delete(products);
+        try { // TRYING TO DELETE
+            productsRepository.delete(products);
+
+        } catch (Exception e) { // HANDLING GLOBAL ERROR
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
 }

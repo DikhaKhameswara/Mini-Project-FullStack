@@ -28,15 +28,8 @@ public class ErrorController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage().toUpperCase());
     }
 
-    // HttpMessageNotReadableException
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> requestNotReadeable(HttpMessageNotReadableException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage().toUpperCase());
     }
-
-    // @ExceptionHandler(NoSuchElementException.class)
-    // public ResponseEntity<List> nullEntity() {
-    // return ResponseEntity.ok(new ArrayList<>());
-    // }
 }

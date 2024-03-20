@@ -31,42 +31,62 @@ public class CategoriesController {
     @GetMapping("/listcategories")
     public ResponseEntity<List<CategoriesResponse>> allCategories() {
 
+        // EXECUTE FUNCTION GETALLCATEGORIES FROM CATEGORIES SERVICE
         List<CategoriesResponse> categories = cService.getAllCategories();
+
         return new ResponseEntity<List<CategoriesResponse>>(categories, HttpStatus.OK);
     }
 
     @GetMapping("/detailcategory/{id}")
-    public ResponseEntity getDetailCategory(@PathVariable Long id) {
+    public ResponseEntity<Object> getDetailCategory(@PathVariable Long id) {
         CategoriesResponse cR = new CategoriesResponse();
-        try {
+
+        try { // TRYING TO GET CATEGORY BY ID
             cR = cService.getCategoriesById(id);
-        } catch (NoSuchElementException e) {
-            // TODO: handle exception
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
+
+        } catch (NoSuchElementException e) { // HANDLING ERROR IF CATEGORY NOT FOUND
+            return new ResponseEntity<Object>("{}", HttpStatus.OK);
+
+        } catch (Exception e) { // HANDLING GLOBAL ERROR
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
-        return new ResponseEntity<CategoriesResponse>(cR, HttpStatus.OK);
+
+        return new ResponseEntity<>(cR, HttpStatus.OK);
     }
 
     @PostMapping("/addcategory")
     public ResponseEntity<ResponseSuccess> postNewCategory(@RequestBody AddCategoryRequest request) {
+
+        // EXECUTE ADD CATEGORY FROM CATEGORY SERVICE
         cService.addCategory(request);
-        return new ResponseEntity<ResponseSuccess>(ResponseSuccess.builder().build(), HttpStatus.OK);
+
+        return new ResponseEntity<ResponseSuccess>(
+                ResponseSuccess.builder().build(),
+                HttpStatus.OK);
     }
 
     @PutMapping("/updatecategory/{id}")
     public ResponseEntity<ResponseSuccess> putUpdateCategory(
             @PathVariable Long id,
             @RequestBody AddCategoryRequest request) {
+
+        // EXECUTE UPDATE CATEGORY FUNCTION FROM CATEGORY SERVICE
         cService.updateCategory(id, request);
-        return new ResponseEntity<ResponseSuccess>(ResponseSuccess.builder().build(), HttpStatus.OK);
+
+        return new ResponseEntity<ResponseSuccess>(
+                ResponseSuccess.builder().build(),
+                HttpStatus.OK);
     }
 
     @DeleteMapping("/deletecategory/{id}")
     public ResponseEntity<ResponseSuccess> deleteCategory(@PathVariable Long id) {
+
+        // EXECUTE DELETE FUNCTION ON CATEGORY SERVICE
         cService.deleteCategory(id);
-        return new ResponseEntity<ResponseSuccess>(ResponseSuccess.builder().build(), HttpStatus.OK);
+
+        return new ResponseEntity<ResponseSuccess>(
+                ResponseSuccess.builder().build(),
+                HttpStatus.OK);
     }
 
 }

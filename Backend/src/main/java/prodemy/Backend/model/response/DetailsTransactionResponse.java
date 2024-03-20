@@ -1,6 +1,5 @@
 package prodemy.Backend.model.response;
 
-import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -14,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DetailsTransactionResponse {
 
-    private Date transaction_date;
+    private String transaction_date;
     private Long transaction_id;
     private Long total_pay;
     private Long total_amount;

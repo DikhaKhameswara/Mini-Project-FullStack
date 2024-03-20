@@ -37,20 +37,23 @@ public class ProductsController {
     @GetMapping("/listproduct")
     public ResponseEntity<List<ProductsResponse>> getAllProducts(HttpServletRequest request) {
 
+        // GET ALL PARAMS FROM API
         String titleSearch = request.getParameter("title");
         String sortBy = request.getParameter("sort_by");
         String sortOrder = request.getParameter("sort_order");
         String cId = request.getParameter("category_id");
 
         List<ProductsResponse> pR = new ArrayList<>();
-        if (cId != null) {
+
+        if (cId != null) { // EXECUTING WHEN CATEGORY_ID NOT NULL
             try {
                 Long categoryId = Long.valueOf(request.getParameter("category_id"));
                 pR = categoriesService.getAllProductsByCategoryId(categoryId);
-            } catch (NumberFormatException e) {
+
+            } catch (NumberFormatException e) {// HANDLING WHEN CATEGORY_ID IS NOT A NUMBER
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "KATEGORI ID BUKAN NUMERIK");
             }
-        } else {
+        } else { // EXECUTING WHEN USING SEARCHING AND/OR SORTING
             pR = productsService.getAllProducts(titleSearch, sortBy, sortOrder);
         }
 
@@ -58,16 +61,17 @@ public class ProductsController {
     }
 
     @GetMapping("/detailproduct/{id}")
-    public ResponseEntity getDetailProduct(@PathVariable Long id) {
+    public ResponseEntity<Object> getDetailProduct(@PathVariable Long id) {
 
         ProductsResponse pR = new ProductsResponse();
-        try {
+
+        try {// EXECUTING WHEN CATEGORY_ID NOT NULL
             pR = productsService.getDetailsProduct(id);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NullPointerException e) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
+
+        } catch (NoSuchElementException e) { // CATCH HANDLING WHEN PRODUCT_RESPONSE VALUE IS NULL
+            return new ResponseEntity<Object>("{}", HttpStatus.OK);
+
+        } catch (Exception e) {// HANDLING GLOBAL ERROR
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
         return new ResponseEntity<>(pR, HttpStatus.OK);
@@ -76,6 +80,7 @@ public class ProductsController {
     @PostMapping("/addproduct")
     public ResponseEntity<ResponseSuccess> postAddProduct(@RequestBody AddUpdateProductRequest request) {
 
+        // EXECUTING ADDPRODUCT FUNCTION FROM SERVICE
         productsService.addProduct(request);
 
         return new ResponseEntity<ResponseSuccess>(
@@ -87,7 +92,9 @@ public class ProductsController {
     public ResponseEntity<ResponseSuccess> putUpdateProduct(@RequestBody AddUpdateProductRequest request,
             @PathVariable Long id) {
 
+        // EXECUTING UPDATE FUNCTION FROM SERVICE
         productsService.updateproduct(id, request);
+
         return new ResponseEntity<ResponseSuccess>(
                 ResponseSuccess.builder().build(),
                 HttpStatus.OK);
@@ -96,6 +103,7 @@ public class ProductsController {
     @DeleteMapping("/deleteproduct/{id}")
     public ResponseEntity<ResponseSuccess> deleteDeleteProduct(@PathVariable Long id) {
 
+        // EXECUTING DELETE FUNCTION FROM SERVICE
         productsService.deleteProduct(id);
 
         return new ResponseEntity<ResponseSuccess>(

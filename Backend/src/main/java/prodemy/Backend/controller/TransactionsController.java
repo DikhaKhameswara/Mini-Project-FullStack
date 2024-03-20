@@ -34,20 +34,20 @@ public class TransactionsController {
         return new ResponseEntity<List<TransactionsResponse>>(tR, HttpStatus.OK);
     }
 
-    @GetMapping("/detailtransaction/{id}")
-    public ResponseEntity<DetailsTransactionResponse> transactionsById(@PathVariable Long id) {
+    @GetMapping(path = "/detailtransaction/{id}")
+    public ResponseEntity<Object> transactionsById(@PathVariable Long id) {
         DetailsTransactionResponse tR = new DetailsTransactionResponse();
 
         try {
             tR = tService.getTransactionsById(id);
         } catch (NoSuchElementException e) { // HANDLER IF tR VALUE IS NULL
             // TODO: handle exception
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<Object>("{}", HttpStatus.OK);
         } catch (Exception e) { // HANDLER FOR GLOBAL CASE EXCEPTION
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
-        return new ResponseEntity<DetailsTransactionResponse>(tR, HttpStatus.OK);
+        return new ResponseEntity<>(tR, HttpStatus.OK);
     }
 
     @PostMapping("/addtransaction")

@@ -15,17 +15,6 @@ import PrivateRoute from "./route/PrivateRoute";
 
 export default function App() {
 
-    // axiosBackend.get("/detailproduct/100").then((res) => console.log(res.data));
-    // const data = {
-    //     title: "Minuman 3",
-    //     image: "yeyeye",
-    //     price: 1000,
-    //     category_id: 5
-    // }
-    // axiosBackend.post("addproduct", data)
-    //     .then((res) => console.log(res))
-    //     .catch((err) => console.log(err.response?.data))
-
     return (
         <div className="w-full h-100vh px-2 font-saira">
             <Routes>

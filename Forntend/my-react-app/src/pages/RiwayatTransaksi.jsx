@@ -10,6 +10,11 @@ import { toRupiah } from '../utils/toRupiah';
 
 export default function RiwayatTransaksi() {
 
+    axiosBackend.get("/detailtransaction/100").then((res) => {
+        console.log(res.data);
+        console.log(typeof (res.data))
+    });
+
     const fetcher = (url) => axiosBackend.get(url).then(res => res.data);
     const { data, isLoading } = useSWR("/listtransaction", fetcher);
 
