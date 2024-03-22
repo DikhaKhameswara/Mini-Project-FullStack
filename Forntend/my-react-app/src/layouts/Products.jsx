@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { HiOutlineSortAscending, HiOutlineSortDescending } from "react-icons/hi";
+import { ImSad } from "react-icons/im";
 import { useDispatch } from 'react-redux';
 import useSWR from 'swr';
 import CategoriesButton from '../component/CategoriesButton';
@@ -7,22 +8,14 @@ import ProductCard from '../component/ProductCard';
 import { addBarang } from '../store/reducer/cartSlice';
 import { axiosBackend } from '../utils/axios';
 
-export default function Products() {
-
-    const [showDropdown, setShowDropdown] = useState(false);
+export default function ProductsCopy() {
 
     const [c_Id, setC_Id] = useState("");
+    const [c_Name, setC_Name] = useState("");
     const [title, setTitle] = useState("");
     const [sortBy, setSortBy] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
     const [query, setQuery] = useState("");
-
-    const [q2, setQ2] = useState({
-        category_id: "",
-        title: "",
-        sort_order: "",
-        sort_by: "",
-    });
 
     const dispatch = useDispatch();
 
@@ -35,16 +28,19 @@ export default function Products() {
         setSortBy("")
         if (c_Id == "") {
             setC_Id("");
+            setC_Name("");
             setQuery("");
         }
         else {
             setC_Id(c_Id);
+            setC_Name(c_Name);
             setQuery(`?category_id=${c_Id}`);
         }
     }, [c_Id])
 
     useEffect(() => {
         setC_Id("");
+        setC_Name("");
         if (title == "") {
             setTitle("")
             setQuery("")
@@ -59,6 +55,7 @@ export default function Products() {
 
     useEffect(() => {
         setC_Id("");
+        setC_Name("");
         if (sortBy == "") {
             setSortBy("")
         }
@@ -95,57 +92,70 @@ export default function Products() {
         setTitle("");
         setQuery("");
     }
-    console.log(query)
+    console.log(products)
+    console.log(categories)
     return (categories == undefined ? "" :
-        <div className=' h-full flex flex-col gap-y-2'>
-            <div className=' text-lg flex place-content-between'>
-                <div className='flex gap-x-5'>
+        <div className=' h-full w-full flex flex-col gap-y-2'>
+            <div className=' text-lg flex place-content-between w-full h-[5%]'>
+                <div className='flex gap-x-5 place-items-center'>
                     <div onClick={() => clearQuery()}>
                         <CategoriesButton name={"Clear All"} idActive={""} />
                     </div>
                     {
-                        categories.map((item) => (
-                            <div key={item.category_id} onClick={() => setC_Id(item.category_id)}>
+                        categories?.length <= 3 ? categories.map((item) => (
+                            <div key={item.category_id} onClick={() => { setC_Id(item.category_id); setC_Name(item.category_name); }}>
                                 <CategoriesButton name={item.category_name} category_id={item.category_id} idActive={c_Id} />
                             </div>
-                        ))
+                        )) :
+                            <div className='relative select-none group'>
+                                <div className=' rounded-lg cursor-pointer hover:bg-red-500 hover:text-white'>
+                                    {
+                                        c_Id != "" ? <CategoriesButton name={c_Name} /> : <CategoriesButton name={"Kategori"} idActive={""} />
+                                    }
+                                </div>
+                                <div className=' invisible group-hover:visible absolute top-7 h-fit z-10 p-2 border-2 bg-slate-100 rounded-2xl flex flex-col gap-y-2'>
+                                    {
+                                        categories.map((item) => (
+                                            <div key={item.category_id} onClick={() => { setC_Id(item.category_id); setC_Name(item.category_name); }}>
+                                                <CategoriesButton name={item.category_name} category_id={item.category_id} idActive={c_Id} />
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </div>
                     }
                 </div>
-                <div className=' flex w-[30rem] place-content-between'>
+                <div className=' flex place-content-between w-[40%] place-items-center'>
                     <div className='flex gap-x-1'>
                         <span>Search Name:</span>
                         <input
                             type="text"
-                            className='border-2 border-black px-1'
+                            className='border-2 border-black px-1 h-[1]'
                             onChange={(e) => handleSearchVal(e)} value={title} />
+
                     </div>
-                    <div className='relative select-none ' onClick={() => setShowDropdown(!showDropdown)}>
-                        <div className=' border-2 px-2 rounded-lg cursor-pointer hover:bg-red-500 hover:text-white'>
+                    <div className='relative select-none group'>
+                        <div className=' transition ease-in-out duration-500 border-2 px-2 rounded-lg cursor-pointer hover:bg-red-500 hover:text-white'>
                             {
-                                sortBy == "" ? <span>SORTING</span> : sortBy.toUpperCase()
+                                sortBy != "" ? sortBy.toUpperCase() : <span>SORTING</span>
                             }
                         </div>
-                        {
-                            showDropdown ?
-                                <div className=' absolute top-9 h-fit z-10 p-2 border-2 bg-slate-100 rounded-2xl flex flex-col gap-y-2'>
-                                    <div
-                                        onClick={() => setSortBy("title")}
-                                        className=' cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
-                                        TITLE
-                                    </div>
-                                    <div
-                                        onClick={() => setSortBy("price")}
-                                        className=' cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
-                                        PRICE
-                                    </div>
-                                </div>
-                                :
-                                ""
-                        }
+                        <div className=' invisible group-hover:visible absolute top-8 h-fit z-10 p-2 border-2 bg-slate-100 rounded-2xl flex flex-col gap-y-2'>
+                            <div
+                                onClick={() => setSortBy("title")}
+                                className=' transition ease-in-out duration-500 cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
+                                TITLE
+                            </div>
+                            <div
+                                onClick={() => setSortBy("price")}
+                                className=' transition ease-in-out duration-500 cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
+                                PRICE
+                            </div>
+                        </div>
                     </div>
                     <div
                         onClick={() => sortOrder == "asc" ? setSortOrder("desc") : setSortOrder("asc")}
-                        className=' border-2 cursor-pointer select-none rounded-lg hover:bg-red-500 hover:text-white text-3xl'>
+                        className=' transition ease-in-out duration-500 border-2 cursor-pointer select-none rounded-lg hover:bg-red-500 hover:text-white text-3xl h-fit'>
                         {
                             sortOrder == "desc" ? <HiOutlineSortDescending /> : <HiOutlineSortAscending />
                         }
@@ -153,13 +163,21 @@ export default function Products() {
                 </div>
 
             </div>
-            <div className='grid grid-cols-3 gap-2 overflow-y-auto'>
-                {products == undefined || categories == undefined ? "" :
-                    products.map((item) => (
-                        <div key={item.id} className=' cursor-pointer' onClick={() => handleClickAddBarang(item)}>
-                            <ProductCard name={item.title} image={item.image} price={item.price} />
+            <div className='w-full h-[95%]'>
+                {products == undefined || categories == undefined ? <span>Waduh Ada Masalah</span> :
+                    products == 0 ?
+                        <div className=' flex place-items-center justify-center text-7xl h-full'>
+                            Produk Tidak Ditemukan &nbsp; <ImSad />
                         </div>
-                    ))
+                        : <div className='grid grid-cols-3 gap-2 place-content-start overflow-y-auto w-full h-full'>
+                            {
+                                products.map((item) => (
+                                    <div key={item.id} className=' cursor-pointer' onClick={() => handleClickAddBarang(item)}>
+                                        <ProductCard name={item.title} image={item.image} price={item.price} />
+                                    </div>
+                                ))
+                            }
+                        </div>
                 }
             </div>
         </div>

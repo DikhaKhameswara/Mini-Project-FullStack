@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
-import lombok.extern.slf4j.Slf4j;
 import prodemy.Backend.model.entity.Products;
 import prodemy.Backend.model.entity.TransactionDetails;
 import prodemy.Backend.model.entity.Transactions;
@@ -25,20 +24,15 @@ import prodemy.Backend.model.response.DetailsTransactionProduct;
 import prodemy.Backend.model.response.DetailsTransactionResponse;
 import prodemy.Backend.model.response.TransactionsResponse;
 import prodemy.Backend.repository.ProductsRepository;
-import prodemy.Backend.repository.TransactionDetailsRepository;
 import prodemy.Backend.repository.TransactionsRepository;
 import prodemy.Backend.service.TransactionsService;
 
 @SuppressWarnings("null")
 @Service
-@Slf4j
 public class TransactionsServiceI implements TransactionsService {
 
     @Autowired
     private TransactionsRepository tRepository;
-
-    @Autowired
-    private TransactionDetailsRepository tDetailsRepository;
 
     @Autowired
     private ProductsRepository pRepository;

@@ -40,9 +40,10 @@ public class TransactionsController {
 
         try {
             tR = tService.getTransactionsById(id);
+
         } catch (NoSuchElementException e) { // HANDLER IF tR VALUE IS NULL
-            // TODO: handle exception
             return new ResponseEntity<Object>("{}", HttpStatus.OK);
+
         } catch (Exception e) { // HANDLER FOR GLOBAL CASE EXCEPTION
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

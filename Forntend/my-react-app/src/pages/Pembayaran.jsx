@@ -37,18 +37,10 @@ export default function Pembayaran() {
         }
     }
 
-    // function swallPopUp(data, message, icon) {
-    //     return Swal.fire({
-    //         title: data,
-    //         text: message,
-    //         icon: icon
-    //     });
-    // }
-
     function bayar() {
 
         if (kembalian < 0 || totalPay.toString() == NaN.toString()) {
-            return swallPopUp("Pembayaran Dibatalkan", "Uang Tidak Cukup", "error");
+            return swallPopUp("Pembayaran Dibatalkan", "Uang Tidak Cukup", "warning");
         }
 
         let tDList = [];
@@ -86,7 +78,7 @@ export default function Pembayaran() {
     }
 
     return (
-        <div className='flex h-[52rem] p-2 gap-x-2'>
+        <div className='flex h-svh gap-x-2'>
             <div className=' border-4 rounded-xl w-3/5 p-2 h-full flex flex-col place-content-between relative'>
                 <div className=' border-b-4 border-red-700 relative h-[5rem]'>
                     <div className=' absolute' onClick={() => navigate("/")}>

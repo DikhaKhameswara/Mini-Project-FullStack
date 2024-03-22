@@ -6,12 +6,12 @@ import Products from '../layouts/Products';
 export default function OrderProduk() {
 
     return (
-        <div className='flex gap-x-2 h-[52rem] rounded-2xl border-4 m-2'>
+        <div className='flex gap-x-2 h-svh rounded-2xl border-4'>
             <div className='w-2/3 flex flex-col gap-y-2 p-2'>
                 <div className='h-[10%] p-1 border-b-4 border-red-700'>
                     <Header />
                 </div>
-                <div className=' h-[90%]'>
+                <div className=' h-[90%] w-full'>
                     <Products />
                 </div>
             </div>

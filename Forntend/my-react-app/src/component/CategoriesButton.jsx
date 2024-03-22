@@ -8,7 +8,7 @@ export default function CategoriesButton({ name, category_id, idActive }) {
     // console.log(idActive);
 
     return (
-        <button className={` px-2 rounded-lg text-lg hover font-semibold hover:bg-red-500 hover:text-white ${className}`}>
+        <button className={` transition ease-in-out duration-300 px-2 rounded-lg text-lg hover font-semibold hover:bg-red-500 hover:text-white ${className}`}>
             {name}
         </button>
     )

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import Button from '../component/Button';
+import MyTable from '../component/MyTable';
 import { axiosBackend } from '../utils/axios';
 import { handleDate } from '../utils/handleDate';
 import { toRupiah } from '../utils/toRupiah';
@@ -13,6 +14,46 @@ export default function DetailTransaksi() {
 
     const fetcher = (url) => axiosBackend.get(url).then((res) => res.data);
     const { data, isLoading } = useSWR(`/detailtransaction/${params.id}`, fetcher);
+
+    const columns = useMemo(
+        () => [
+            {
+                accessorFn: row => row.product_id,
+                id: "id",
+                cell: info => info.getValue(),
+                header: () => <span>ID Produk</span>,
+                footer: props => props.column.id
+            },
+            {
+                accessorFn: row => row.product_title,
+                id: "product_title",
+                cell: info => info.getValue(),
+                header: () => <span>Nama Produk</span>,
+                footer: props => props.column.id
+            },
+            {
+                accessorFn: row => row.product_price,
+                id: "product_price",
+                cell: info => toRupiah(info.getValue()),
+                header: () => <span>Harga Produk</span>,
+                footer: props => props.column.id
+            },
+            {
+                accessorFn: row => row.product_quantity,
+                id: "product_quantity",
+                cell: info => info.getValue(),
+                header: () => <span>Quantity</span>,
+                footer: props => props.column.id
+            },
+            {
+                accessorFn: row => row.product_subtotal,
+                id: "product_subtotal",
+                cell: info => toRupiah(info.getValue()),
+                header: () => <span>Subtotal</span>,
+                footer: props => props.column.id
+            }
+        ]
+    );
 
 
 
@@ -55,30 +96,10 @@ export default function DetailTransaksi() {
                     </thead>
                 </table>
             </div>
-            <table className="text-left mx-[2%] flex flex-col">
-                <thead className="bg-black text-white w-full">
-                    <tr className="flex w-full min-h-[2rem] text-xl ">
-                        <th className="p-1 w-[10%]">ID Produk</th>
-                        <th className="p-1 w-[30%]">Nama Produk</th>
-                        <th className="p-1 w-[20%]">Harga Satuan</th>
-                        <th className="p-1 w-[20%]">Quantity</th>
-                        <th className="p-1 w-[20%]">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody className="bg-grey-light flex flex-col overflow-auto w-full h-[40vh]">
-                    {
-                        data?.product_details_transaction?.map((item) => (
-                            <tr key={item.product_id} className=' flex w-full min-h-[3rem] max-h-[5rem]'>
-                                <td className=' p-1 w-[10%] border-b-2 border-red-700 flex place-items-center'>{item.product_id}</td>
-                                <td className=' p-1 w-[30%] border-b-2 border-red-700 flex place-items-center'>{item.product_title}</td>
-                                <td className=' p-1 w-[20%] border-b-2 border-red-700 flex place-items-center'>{toRupiah(item.product_price)}</td>
-                                <td className=' p-1 w-[20%] border-b-2 border-red-700 flex place-items-center' >{item.product_quantity}</td>
-                                <td className=' p-1 w-[20%] border-b-2 border-red-700 flex place-items-center' >{toRupiah(item?.product_subtotal)}</td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-            </table>
+            {
+                isLoading ? "" :
+                    <MyTable data={data.product_details_transaction} columns={columns} />
+            }
         </div>
     )
 }

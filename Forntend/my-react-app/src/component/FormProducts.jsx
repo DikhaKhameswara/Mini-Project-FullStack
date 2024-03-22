@@ -111,11 +111,11 @@ export default function FormProducts() {
     }
 
 
-    return ((id && iLCategories) || (id && iLUpdate) ? "" :
+    return ((id == undefined && iLCategories == true) || (!id && iLUpdate == false) ? "" :
         <div className='p-[2rem] flex flex-col gap-y-[3rem] w-full h-[53rem]'>
             <div className=' border-b-4 border-red-700 relative'>
                 <span className=' text-7xl'>Form Produk</span>
-                <div className=' absolute bottom-3 right-3' onClick={() => navigate("/admin")}>
+                <div className=' absolute bottom-3 right-3' onClick={() => navigate("/listproduk")}>
                     <Button>
                         Back
                     </Button>
