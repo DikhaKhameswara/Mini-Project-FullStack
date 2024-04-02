@@ -34,6 +34,6 @@ public class TransactionDetails {
     private Transactions transaction;
 
     @ManyToOne(targetEntity = Products.class)
-    @JoinColumn(name = "PRODUCTS_ID")
+    @JoinColumn(name = "PRODUCT_ID")
     private Products product;
 }

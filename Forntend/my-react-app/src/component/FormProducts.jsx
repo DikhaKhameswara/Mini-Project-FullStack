@@ -37,7 +37,7 @@ export default function FormProducts() {
     }, [categories])
 
     const schema = object().shape({
-        title: string().defined().required("NAMA PRODUK BERMASALAH"),
+        title: string().max(255, "NAMA PRODUK TIDAK BOLEH PANJANG").defined().required("NAMA PRODUK BERMASALAH"),
         image: string().url().required("URL GAMBAR BERMASALAH"),
         price: number().min(1, "HARGA PRODUK BERMASALAH").required("HARGA PRODUK BERMASALAH"),
         category_id: number().notOneOf([NaN, null, undefined, ""], "KATEGORI PRODUK HARUS DIPILIH").oneOf(categoryId)
@@ -98,16 +98,12 @@ export default function FormProducts() {
 
     const onSubmitForm = (data) => {
         data = { ...data, title: data.title.toUpperCase() };
-        // schema.validate(data)
-        //     .then(() => console.log("success"))
-        //     .catch((err) => console.log(err));
         swallConfirmation(`Apakah Anda Ingin ${id ? `Mengupdate Produk \n ${data.title}` : `Menambahkan Produk \n ${data.title} `} `)
             .then(() => {
                 sendRequest(data);
                 resetInput();
             })
             .catch(() => swallPopUp("Proses Dibatalkan", "", "info"))
-        // console.log(coba.toUpperCase())
     }
 
 

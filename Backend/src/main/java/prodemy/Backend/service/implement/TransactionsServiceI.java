@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import prodemy.Backend.model.response.TransactionsResponse;
 import prodemy.Backend.repository.ProductsRepository;
 import prodemy.Backend.repository.TransactionsRepository;
 import prodemy.Backend.service.TransactionsService;
+import prodemy.Backend.service.implement.filtering.TransactionsSpecifications;
 
 @SuppressWarnings("null")
 @Service
@@ -42,10 +44,19 @@ public class TransactionsServiceI implements TransactionsService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TransactionsResponse> getAllTransactions() {
+    public List<TransactionsResponse> getAllTransactions(List<String> products) {
+
+        List<Specification<Transactions>> lSpecifications = new ArrayList<>();
+
+        if (products != null) {
+            for (String productId : products) {
+                Specification<Transactions> spec = new TransactionsSpecifications(productId);
+                lSpecifications.add(spec);
+            }
+        }
 
         // GET DATA FROM DATABASE
-        List<Transactions> transactions = tRepository.findAll();
+        List<Transactions> transactions = tRepository.findAll(Specification.anyOf(lSpecifications));
 
         // TRANSFORM DATA FROM DATABASE TO RESPONSE
         List<TransactionsResponse> tResponses = new ArrayList<>();
@@ -160,6 +171,7 @@ public class TransactionsServiceI implements TransactionsService {
             }
 
             // SET EACH PRODUCT
+            System.out.println(product.getId());
             td.setProduct(product);
             td.setQuantity(tDetails.getQuantity());
             td.setSubtotal(tDetails.getSubtotal());

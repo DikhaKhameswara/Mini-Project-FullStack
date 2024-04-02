@@ -2,11 +2,12 @@ package prodemy.Backend.service.implement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +19,12 @@ import jakarta.validation.Validator;
 import prodemy.Backend.model.entity.Categories;
 import prodemy.Backend.model.entity.Products;
 import prodemy.Backend.model.request.AddUpdateProductRequest;
+import prodemy.Backend.model.request.SearchCriteria;
 import prodemy.Backend.model.response.ProductsResponse;
 import prodemy.Backend.repository.CategoriesRepository;
 import prodemy.Backend.repository.ProductsRepository;
 import prodemy.Backend.service.ProductsService;
+import prodemy.Backend.service.implement.filtering.ProductsSpecification;
 
 @SuppressWarnings("null")
 @Service
@@ -38,38 +41,33 @@ public class ProductsServiceI implements ProductsService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductsResponse> getAllProducts(String titleSearch, String sortBy, String sortOrder) {
+    public List<ProductsResponse> getAllProducts(Map<String, Object> params) {
 
         List<ProductsResponse> pR = new ArrayList<>();
-
         List<Products> products = new ArrayList<>();
 
-        Sort sort;
-        if (sortBy != null) { // GET DATA FROM DATABASE WITH SORTING VALUE
-            if (sortBy.equalsIgnoreCase("title") || sortBy.equalsIgnoreCase("price")) {
-                if (sortOrder.equalsIgnoreCase("asc") || sortOrder.equalsIgnoreCase("desc")) {
-                    sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
-                            : Sort.by(sortBy).descending();
-                    if (titleSearch == null) { // GET DATA FROM DATABASE IF NO TITLE SEARCH INPUT
-                        products = productsRepository.findAll(sort);
-                    } else { // GET DATA FROM DATABASE WITH TITLE SEARCH
-                        titleSearch = "%" + titleSearch + "%";
-                        products = productsRepository.findByTitleLike(titleSearch, sort).orElse(products);
-                    }
-                } else { // RETURN IF SORT ORDER NOT ONE OF (ASC, DESC)
-                    return pR;
-                }
-            } else { // RETURN IF SORT BY NOT ONE OF (TITLE, PRICE)
-                return pR;
-            }
+        List<Specification<Products>> specs = new ArrayList<>();
+        System.out.println(params);
 
-        } else { // GET ALL DATA FROM DATABASE WITHOUT SORTING
-            products = productsRepository.findAll();
+        for (String search : params.keySet()) {
+            Specification<Products> pSpecs = Specification.where(
+                    ProductsSpecification
+                            .builder()
+                            .criteria(
+                                    SearchCriteria.builder()
+                                            .key(search)
+                                            .value(params.get(search))
+                                            .build())
+                            .build());
 
-            if (products.size() == 0) { // RETURN LIST PRODUCT RESPONSE IF NO PRODUCTS ON DATABASE
-                return pR;
-            }
+            specs.add(pSpecs);
         }
+
+        products = productsRepository.findAll(Specification.allOf(specs));
+
+        // Pageable pageable = PageRequest.of(0, 9, sort);
+        // Page<Products> productsPage =
+        // productsRepository.findAll(Specification.allOf(specs), pageable);
 
         for (Products product : products) {
             ProductsResponse p = new ProductsResponse();

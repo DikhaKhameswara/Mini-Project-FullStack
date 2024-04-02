@@ -1,13 +1,14 @@
 package prodemy.Backend.service;
 
 import java.util.List;
+import java.util.Map;
 
 import prodemy.Backend.model.request.AddUpdateProductRequest;
 import prodemy.Backend.model.response.ProductsResponse;
 
 public interface ProductsService {
 
-    List<ProductsResponse> getAllProducts(String titleSearch, String sortBy, String sortOrder);
+    List<ProductsResponse> getAllProducts(Map<String, Object> params);
 
     ProductsResponse getDetailsProduct(Long id);
 

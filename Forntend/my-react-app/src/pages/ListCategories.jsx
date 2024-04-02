@@ -53,7 +53,7 @@ export default function ListCategories() {
         return (
             <div className="flex place-content-evenly gap-x-3">
                 <button
-                    onClick={() => navigate(`/detailproduk/${id}`)}
+                    onClick={() => navigate(`/detailkategori/${id}`)}
                     className={`bg-[#D7E1B9] hover:bg-slate-400 p-2 rounded-xl font-bold  flex place-content-center gap-x-2 w-1/3`}>
                     Detail
                 </button>

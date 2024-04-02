@@ -3,7 +3,7 @@ import { toRupiah } from '../utils/toRupiah'
 
 export default function ProductCard({ image, name, price }) {
     return (
-        <div className=' border-2 border-black w-full h-[15rem] rounded-2xl relative p-3'>
+        <div className=' border-2 border-black w-full h-[14rem] rounded-2xl relative p-3'>
 
             <div className=''>
                 {name}

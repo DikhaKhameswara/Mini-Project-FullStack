@@ -62,7 +62,6 @@ export default function Pembayaran() {
             .then(() => {
                 axiosBackend.post("/addtransaction", request)
                     .then((res) => {
-                        console.log(res.data);
                         swallPopUp("Pembayaran Tuntas", "SUCCESS", "success")
                             .then(() => {
                                 navigate("/");
@@ -70,7 +69,6 @@ export default function Pembayaran() {
                             })
                     })
                     .catch((err) => {
-                        console.log(err);
                         swallPopUp("Pembayaran Gagal", err.response?.data, "error");
                     })
             })

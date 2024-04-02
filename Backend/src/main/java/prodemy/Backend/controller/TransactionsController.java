@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,8 +29,11 @@ public class TransactionsController {
     private TransactionsService tService;
 
     @GetMapping("/listtransaction")
-    public ResponseEntity<List<TransactionsResponse>> allTransactions() {
-        List<TransactionsResponse> tR = tService.getAllTransactions();
+    public ResponseEntity<List<TransactionsResponse>> allTransactions(
+            @RequestParam(required = false) List<String> products) {
+        System.out.println(products);
+
+        List<TransactionsResponse> tR = tService.getAllTransactions(products);
 
         return new ResponseEntity<List<TransactionsResponse>>(tR, HttpStatus.OK);
     }

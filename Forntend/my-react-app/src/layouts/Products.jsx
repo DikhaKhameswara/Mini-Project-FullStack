@@ -21,55 +21,32 @@ export default function ProductsCopy() {
 
     const fetcher = (url) => axiosBackend.get(url).then((res) => res.data);
     const { data: categories, isLoading: iLCategories } = useSWR('/listcategories', fetcher);
-    const { data: products, isLoading: iLProducts } = useSWR(`/listproduct${query}`, fetcher);
+    const { data: products, isLoading: iLProducts } = useSWR(
+        `/listproduct${query == "" ? "" : `?${query}`}
+        `, fetcher
+    );
 
     useEffect(() => {
-        setTitle("")
+        setTitle(title)
+        setSortBy(sortBy)
+        setSortOrder(sortOrder)
+        setC_Id(c_Id)
+
+        setQuery(
+            (title == "" ? "" : `&title=${title}`) +
+            (c_Id == "" ? "" : `&category_id=${c_Id}`) +
+            (sortBy == "" ? "" : `&sort_by=${sortBy}`) +
+            (sortBy == "" ? "" : sortOrder == "" ? "&sort_order=asc" : `&sort_order=${sortOrder}`)
+        )
+    }, [title, sortBy, sortOrder, c_Id])
+
+    function clearQuery() {
+        setC_Id("");
         setSortBy("")
-        if (c_Id == "") {
-            setC_Id("");
-            setC_Name("");
-            setQuery("");
-        }
-        else {
-            setC_Id(c_Id);
-            setC_Name(c_Name);
-            setQuery(`?category_id=${c_Id}`);
-        }
-    }, [c_Id])
-
-    useEffect(() => {
-        setC_Id("");
-        setC_Name("");
-        if (title == "") {
-            setTitle("")
-            setQuery("")
-        }
-        else {
-            setTitle(title)
-            if (sortBy != "") {
-                setQuery(`?title=${title}&sort_by=${sortBy}&sort_order=${sortOrder}`)
-            }
-        }
-    }, [title])
-
-    useEffect(() => {
-        setC_Id("");
-        setC_Name("");
-        if (sortBy == "") {
-            setSortBy("")
-        }
-        else {
-            setSortBy(sortBy);
-            setSortOrder(sortOrder);
-            if (title != "") {
-                setQuery(`?title=${title}&sort_by=${sortBy}&sort_order=${sortOrder}`)
-            }
-            else {
-                setQuery(`?sort_by=${sortBy}&sort_order=${sortOrder}`)
-            }
-        }
-    }, [sortBy, sortOrder])
+        setSortOrder("asc");
+        setTitle("");
+        setQuery("");
+    }
 
     function handleSearchVal(event) {
         event.preventDefault();
@@ -85,15 +62,6 @@ export default function ProductsCopy() {
         dispatch(addBarang(barang));
     }
 
-    function clearQuery() {
-        setC_Id("");
-        setSortBy("")
-        setSortOrder("asc");
-        setTitle("");
-        setQuery("");
-    }
-    console.log(products)
-    console.log(categories)
     return (categories == undefined ? "" :
         <div className=' h-full w-full flex flex-col gap-y-2'>
             <div className=' text-lg flex place-content-between w-full h-[5%]'>
@@ -113,7 +81,10 @@ export default function ProductsCopy() {
                                         c_Id != "" ? <CategoriesButton name={c_Name} /> : <CategoriesButton name={"Kategori"} idActive={""} />
                                     }
                                 </div>
-                                <div className=' invisible group-hover:visible absolute top-7 h-fit z-10 p-2 border-2 bg-slate-100 rounded-2xl flex flex-col gap-y-2'>
+                                <div className=' invisible group-hover:visible absolute top-7 h-[10rem] overflow-auto
+                                z-10 p-2 border-2 bg-slate-100 rounded-2xl flex flex-col gap-y-2
+                                -translate-y-7 group-hover:translate-y-0 transition-transform
+                                '>
                                     {
                                         categories.map((item) => (
                                             <div key={item.category_id} onClick={() => { setC_Id(item.category_id); setC_Name(item.category_name); }}>
@@ -140,7 +111,11 @@ export default function ProductsCopy() {
                                 sortBy != "" ? sortBy.toUpperCase() : <span>SORTING</span>
                             }
                         </div>
-                        <div className=' invisible group-hover:visible absolute top-8 h-fit z-10 p-2 border-2 bg-slate-100 rounded-2xl flex flex-col gap-y-2'>
+                        <div
+                            className='invisible group-hover:visible absolute top-8 h-fit
+                            z-10 p-2 border-2 bg-slate-100 rounded-2xl flex flex-col gap-y-2
+                            -translate-y-7 group-hover:translate-y-0 transition-transform
+                            '>
                             <div
                                 onClick={() => setSortBy("title")}
                                 className=' transition ease-in-out duration-500 cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
@@ -163,13 +138,18 @@ export default function ProductsCopy() {
                 </div>
 
             </div>
-            <div className='w-full h-[95%]'>
+            <div className='w-full h-[93%] flex place-content-center'>
                 {products == undefined || categories == undefined ? <span>Waduh Ada Masalah</span> :
                     products == 0 ?
                         <div className=' flex place-items-center justify-center text-7xl h-full'>
                             Produk Tidak Ditemukan &nbsp; <ImSad />
                         </div>
-                        : <div className='grid grid-cols-3 gap-2 place-content-start overflow-y-auto w-full h-full'>
+                        : <div
+                            className="
+                            grid grid-cols-3 place-content-start gap-3
+                            w-full h-full overflow-auto
+                            
+                            ">
                             {
                                 products.map((item) => (
                                     <div key={item.id} className=' cursor-pointer' onClick={() => handleClickAddBarang(item)}>

@@ -10,7 +10,7 @@ public interface TransactionsService {
 
     void addTransactionDetails(AddTransactionsRequest request);
 
-    List<TransactionsResponse> getAllTransactions();
+    List<TransactionsResponse> getAllTransactions(List<String> products);
 
     DetailsTransactionResponse getTransactionsById(Long id);
 }

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class AddUpdateProductRequest {
 
     @NotEmpty
-    @Size(max = 255)
+    @Size(max = 255, message = "NAMA PRODUK TIDAK BOLEH PANJANG")
     private String title;
 
     @NotEmpty

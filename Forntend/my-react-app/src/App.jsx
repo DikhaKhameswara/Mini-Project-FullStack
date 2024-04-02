@@ -16,6 +16,7 @@ import PrivateRoute from "./route/PrivateRoute";
 
 export default function App() {
 
+
     return (
         <div className="w-full h-full font-saira flex">
             <div className=" w-[4rem]">

@@ -25,7 +25,7 @@ export default function FormCategory() {
     }
 
     const schema = object().shape({
-        name: string().defined().required("NAMA KATEGORI BERMASALAH")
+        name: string().max(255, "NAMA KATEGORI TIDAK BOLEH PANJANG").defined().required("NAMA KATEGORI BERMASALAH")
     }).required();
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
@@ -57,9 +57,6 @@ export default function FormCategory() {
 
     const onSubmitForm = (data) => {
         data = { name: data.name.toUpperCase() };
-        // schema.validate(data)
-        //     .then(() => console.log("success"))
-        //     .catch((err) => console.log(err));
         swallConfirmation(`Apakah Anda Ingin ${id ? `Mengupdate Kategori \n ${data.name}` : `Menambahkan Kategori \n ${data.name} `} `)
             .then(() => {
                 sendRequest(data);
@@ -67,7 +64,6 @@ export default function FormCategory() {
                 setTitle("")
             })
             .catch(() => swallPopUp("Proses Dibatalkan", "", "info"))
-        // console.log(coba.toUpperCase())
     }
 
 

@@ -106,3 +106,27 @@ TRUNCATE TABLE TRANSACTIONS;
 TRUNCATE TABLE PRODUCTS;
 
 TRUNCATE TABLE CATEGORIES;
+
+use miniproject;
+
+SELECT * FROM products WHERE category_id = 1;
+
+use miniproject
+
+SELECT t.*
+FROM
+    transactions AS t
+    JOIN transaction_details AS td ON t.id = td.transaction_id
+    JOIN products AS p on td.product_id = p.id
+WHERE
+    td.product_id in (1)
+GROUP BY
+    t.id;
+
+SELECT t.*, td.product_id, p.title
+FROM
+    transactions AS t
+    JOIN transaction_details AS td ON t.id = td.transaction_id
+    JOIN products AS p on td.product_id = p.id
+where
+    p.id = 1;
