@@ -130,3 +130,13 @@ FROM
     JOIN products AS p on td.product_id = p.id
 where
     p.id = 1;
+
+use miniproject;
+
+SELECT c.*, COUNT(p.category_id)
+FROM categories as c
+    left join products as p on p.category_id = c.id
+GROUP BY
+    c.id;
+
+SELECT * FROM products;

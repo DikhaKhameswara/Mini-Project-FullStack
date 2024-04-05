@@ -2,10 +2,11 @@ package prodemy.Backend.service.implement;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +16,12 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import prodemy.Backend.model.entity.Categories;
-import prodemy.Backend.model.entity.Products;
 import prodemy.Backend.model.request.AddCategoryRequest;
+import prodemy.Backend.model.request.SearchCriteria;
 import prodemy.Backend.model.response.CategoriesResponse;
-import prodemy.Backend.model.response.ProductsResponse;
 import prodemy.Backend.repository.CategoriesRepository;
 import prodemy.Backend.service.CategoriesService;
+import prodemy.Backend.service.implement.filtering.CategoriesSpecification;
 
 @SuppressWarnings("null")
 @Service
@@ -34,51 +35,21 @@ public class CategoriesServiceI implements CategoriesService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductsResponse> getAllProductsByCategoryId(Long id) {
-
-        Categories categories = new Categories();
-        List<ProductsResponse> pRList = new ArrayList<>();
-
-        try { // TRYING TO GET DATA CATEGORY BY ID FROM DATABASE
-            categories = cRepository.findById(id).get();
-
-        } catch (NoSuchElementException e) { // HANDLING ERROR WHEN CATEGORIES VALUE IS NULL
-            return pRList;
-
-        } catch (Exception e) { // HANDLING GLOBAL ERROR
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-
-        // VALIDATING IF NO PRODUCTS ON SELECTED CATEGORY
-        if (categories.getProducts().size() == 0) {
-            return pRList;
-        }
-
-        // TRANSFORM EACH PRODUCTS TO PRODUCTS RESPONSE
-        for (Products products : categories.getProducts()) {
-            ProductsResponse pR = new ProductsResponse();
-            pR.setId(products.getId());
-            pR.setImage(products.getImage());
-            pR.setPrice(products.getPrice());
-            pR.setTitle(products.getTitle());
-            pR.setCategory_id(id);
-            pR.setCategory_name(categories.getName());
-
-            pRList.add(pR);
-        }
-
-        // RETUN PRODUCTS RESPONSE TO CONTROLLER
-        return pRList;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<CategoriesResponse> getAllCategories() {
-
-        // GET ALL CATEGORIES FROM DATABASE
-        List<Categories> categories = cRepository.findAll();
+    public List<CategoriesResponse> getAllCategories(Map<String, String> params) {
 
         List<CategoriesResponse> cRList = new ArrayList<>();
+
+        List<Specification<Categories>> specs = new ArrayList<>();
+        for (String key : params.keySet()) {
+            Specification<Categories> spec = CategoriesSpecification
+                    .builder()
+                    .criteria(new SearchCriteria(key, params.get(key)))
+                    .build();
+            specs.add(spec);
+        }
+
+        // GET ALL CATEGORIES FROM DATABASE
+        List<Categories> categories = cRepository.findAll(Specification.allOf(specs));
 
         // VALIDATING IF NO CATEGORIES GETTING
         if (categories.size() == 0) {

@@ -1,6 +1,7 @@
 package prodemy.Backend.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -29,10 +31,11 @@ public class CategoriesController {
     private CategoriesService cService;
 
     @GetMapping("/listcategories")
-    public ResponseEntity<List<CategoriesResponse>> allCategories() {
+    public ResponseEntity<List<CategoriesResponse>> allCategories(
+            @RequestParam Map<String, String> params) {
 
         // EXECUTE FUNCTION GETALLCATEGORIES FROM CATEGORIES SERVICE
-        List<CategoriesResponse> categories = cService.getAllCategories();
+        List<CategoriesResponse> categories = cService.getAllCategories(params);
 
         return new ResponseEntity<List<CategoriesResponse>>(categories, HttpStatus.OK);
     }

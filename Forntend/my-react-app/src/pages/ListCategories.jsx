@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FaPlus } from "react-icons/fa";
+import { HiOutlineSortAscending, HiOutlineSortDescending } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import Button from '../component/Button';
@@ -9,8 +10,30 @@ import { swallConfirmation, swallPopUp } from '../utils/mySwal';
 
 export default function ListCategories() {
 
+    const [title, setTitle] = useState("");
+    const [sortBy, setSortBy] = useState("");
+    const [sortOrder, setSortOrder] = useState("asc");
+    const [query, setQuery] = useState(null);
+
     const fetcher = (url) => axiosBackend.get(url).then((res) => res.data);
-    const { data, isLoading, mutate } = useSWR("/listcategories", fetcher);
+    const { data, isLoading, mutate } = useSWR(
+        `/listcategories${query == null ? "" : `?${query}`}`, fetcher);
+
+    useEffect(() => {
+        setTitle(title)
+        setSortBy(sortBy)
+        setSortOrder(sortOrder)
+
+        setQuery(
+            (title == "" ? "" : `&name=${title}`) +
+            (sortBy == "" ? "" : `&sort_by=${sortBy}`) +
+            (sortBy == "" ? "" : sortOrder == "" ? "&sort_order=asc" : `&sort_order=${sortOrder}`)
+        )
+    }, [title, sortBy, sortOrder])
+    function handleSearchVal(event) {
+        event.preventDefault();
+        setTitle(event.target.value);
+    }
 
     useEffect(() => {
         mutate()
@@ -86,6 +109,7 @@ export default function ListCategories() {
             .catch(() => swallPopUp("Data Tidak Jadi Dihapus", "", "info"))
 
     }
+    console.log(query)
     return (
         <div className=' flex flex-col pt-[2rem] px-2 w-full gap-y-[1rem]'>
             <div className=' relative flex place-content-between w-full border-b-4 border-red-700'>
@@ -98,11 +122,54 @@ export default function ListCategories() {
                     </Button>
                 </div>
             </div>
-            {
-                isLoading ? "" :
-                    <MyTable data={data} columns={columns} />
-            }
+            <div className=' relative'>
+                <div className=' flex place-content-between gap-x-2 place-items-center absolute left-[20rem] top-1'>
+                    <div className='flex gap-x-1'>
+                        <span className=' text-2xl'>Search Name:</span>
+                        <input
+                            type="text"
+                            className='border-2 border-black px-1 h-[1]'
+                            onChange={(e) => handleSearchVal(e)} value={title} />
 
+                    </div>
+                    <div className='relative select-none group'>
+                        <div className=' transition ease-in-out duration-500 border-2 px-2 rounded-lg cursor-pointer hover:bg-red-500 hover:text-white'>
+                            {
+                                sortBy != "" ? sortBy.toUpperCase() : <span>SORTING</span>
+                            }
+                        </div>
+                        <div
+                            className='invisible group-hover:visible absolute top-7 h-fit
+                            z-10 p-2 border-2 bg-slate-100 rounded-2xl flex flex-col gap-y-2
+                            -translate-y-7 group-hover:translate-y-0 transition-transform
+                            '>
+                            <div
+                                onClick={() => setSortBy("name")}
+                                className=' transition ease-in-out duration-500 cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
+                                NAMA KATEGORI
+                            </div>
+                            <div
+                                onClick={() => setSortBy("total_products")}
+                                className=' transition ease-in-out duration-500 cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
+                                JUMLAH PRODUK
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        onClick={() => sortOrder == "asc" ? setSortOrder("desc") : setSortOrder("asc")}
+                        className=' transition ease-in-out duration-500 border-2 cursor-pointer select-none rounded-lg hover:bg-red-500 hover:text-white text-3xl h-fit'>
+                        {
+                            sortOrder == "desc" ? <HiOutlineSortDescending /> : <HiOutlineSortAscending />
+                        }
+                    </div>
+                </div>
+                <div>
+                    {
+                        isLoading || data == undefined ? "" :
+                            <MyTable data={data} columns={columns} />
+                    }
+                </div>
+            </div>
         </div>
     )
 }

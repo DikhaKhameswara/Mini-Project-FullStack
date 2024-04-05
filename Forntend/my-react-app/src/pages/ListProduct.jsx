@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import CurrencyInput from 'react-currency-input-field';
 import { FaPlus } from "react-icons/fa";
 import { HiOutlineSortAscending, HiOutlineSortDescending } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
@@ -17,13 +18,14 @@ export default function ListProduct() {
     const [title, setTitle] = useState("");
     const [sortBy, setSortBy] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
-    const [query, setQuery] = useState("");
+    const [startPrice, setStartPrice] = useState(null);
+    const [endPrice, setEndPrice] = useState(null);
+    const [query, setQuery] = useState(null);
 
     const fetcher = (url) => axiosBackend.get(url).then((res) => res.data);
     const { data: categories, isLoading: iLCategories } = useSWR('/listcategories', fetcher);
     const { data: products, isLoading: iLProducts, mutate } = useSWR(
-        `/listproduct${query == "" ? "" : `?${query}`}
-        `, fetcher
+        `/listproduct${query == "" ? "" : `?${query}`}`, fetcher
     );
 
     useEffect(() => {
@@ -31,20 +33,25 @@ export default function ListProduct() {
         setSortBy(sortBy)
         setSortOrder(sortOrder)
         setC_Id(c_Id)
+        setStartPrice(startPrice)
 
         setQuery(
             (title == "" ? "" : `&title=${title}`) +
             (c_Id == "" ? "" : `&category_id=${c_Id}`) +
             (sortBy == "" ? "" : `&sort_by=${sortBy}`) +
-            (sortBy == "" ? "" : sortOrder == "" ? "&sort_order=asc" : `&sort_order=${sortOrder}`)
+            (sortBy == "" ? "" : sortOrder == "" ? "&sort_order=asc" : `&sort_order=${sortOrder}`) +
+            (startPrice == null ? "" : `&start_price=${startPrice}`) +
+            (endPrice == null ? "" : `&end_price=${endPrice}`)
         )
-    }, [title, sortBy, sortOrder, c_Id])
+    }, [title, sortBy, sortOrder, c_Id, startPrice, endPrice])
 
     function clearQuery() {
         setC_Id("");
         setSortBy("")
         setSortOrder("asc");
         setTitle("");
+        setStartPrice("");
+        setEndPrice("");
         setQuery("");
     }
 
@@ -134,6 +141,8 @@ export default function ListProduct() {
             .catch(() => swallPopUp("Data Tidak Jadi Dihapus", "", "info"))
 
     }
+
+    console.log(query);
     return (
         <div className=' flex flex-col pt-[2rem] px-2 w-full gap-y-[1rem]'>
             <div className=' relative flex place-content-between w-full border-b-4 border-red-700'>
@@ -149,7 +158,7 @@ export default function ListProduct() {
             </div>
             <div
                 className=" absolute text-lg flex place-content-between 
-                h-[5%] w-[45rem] right-[3rem] top-[10.5rem]
+                h-[2rem] w-[75%] left-[25rem] top-[11rem]
             ">
                 <div className='flex gap-x-5 place-items-center'>
                     <div onClick={() => clearQuery()}>
@@ -184,7 +193,7 @@ export default function ListProduct() {
                 </div>
                 <div className=' flex place-content-between gap-x-2 place-items-center'>
                     <div className='flex gap-x-1'>
-                        <span>Search Name:</span>
+                        <span className=' text-2xl'>Search Name:</span>
                         <input
                             type="text"
                             className='border-2 border-black px-1 h-[1]'
@@ -212,6 +221,11 @@ export default function ListProduct() {
                                 className=' transition ease-in-out duration-500 cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
                                 PRICE
                             </div>
+                            <div
+                                onClick={() => setSortBy("category")}
+                                className=' transition ease-in-out duration-500 cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
+                                CATEGORY
+                            </div>
                         </div>
                     </div>
                     <div
@@ -222,11 +236,43 @@ export default function ListProduct() {
                         }
                     </div>
                 </div>
-
+                <div className=' flex place-items-center w-[30rem] h-full'>
+                    <span className=' text-nowrap text-2xl'>Rentang Harga: </span>
+                    <CurrencyInput
+                        id="price"
+                        name='price'
+                        prefix='Rp.'
+                        // onChange={tesss}
+                        placeholder="Harga Terendah"
+                        decimalsLimit={0}
+                        value={startPrice}
+                        onValueChange={(value, names, values) => setStartPrice(values.float)}
+                        className='border-2 border-blue-300 w-full rounded-lg px-1 text-lg'
+                    />
+                    <span className=' text-[4rem] font-thin'>~</span>
+                    <CurrencyInput
+                        id="price"
+                        name='price'
+                        prefix='Rp.'
+                        // onChange={tesss}
+                        placeholder="Harga Tertinggi"
+                        decimalsLimit={0}
+                        value={endPrice}
+                        onValueChange={(value, names, values) => setEndPrice(values.float)}
+                        className='border-2 border-blue-300 w-full rounded-lg px-1 h-[2rem] text-lg'
+                    />
+                    {
+                        startPrice != null && endPrice != null && endPrice < startPrice ?
+                            <span className=' absolute bottom-9 text-red-500 text-sm'>
+                                Filter Harga Tidak Bekerja Karena Rentang Harga Salah
+                            </span>
+                            : ""
+                    }
+                </div>
             </div>
             <div>
                 {
-                    iLProducts ? "" :
+                    iLProducts || products == undefined ? "" :
                         <MyTable data={products} columns={columns} />
                 }
             </div>

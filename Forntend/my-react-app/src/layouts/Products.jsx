@@ -126,6 +126,11 @@ export default function ProductsCopy() {
                                 className=' transition ease-in-out duration-500 cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
                                 PRICE
                             </div>
+                            <div
+                                onClick={() => setSortBy("category")}
+                                className=' transition ease-in-out duration-500 cursor-pointer border-2 bg-slate-200 p-1 rounded-xl hover:bg-red-500 hover:text-white'>
+                                CATEGORY
+                            </div>
                         </div>
                     </div>
                     <div

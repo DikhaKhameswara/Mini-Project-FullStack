@@ -1,6 +1,7 @@
 package prodemy.Backend.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +31,9 @@ public class TransactionsController {
 
     @GetMapping("/listtransaction")
     public ResponseEntity<List<TransactionsResponse>> allTransactions(
-            @RequestParam(required = false) List<String> products) {
-        System.out.println(products);
+            @RequestParam Map<String, String> params) {
 
-        List<TransactionsResponse> tR = tService.getAllTransactions(products);
+        List<TransactionsResponse> tR = tService.getAllTransactions(params);
 
         return new ResponseEntity<List<TransactionsResponse>>(tR, HttpStatus.OK);
     }

@@ -1,16 +1,14 @@
 package prodemy.Backend.service;
 
 import java.util.List;
+import java.util.Map;
 
 import prodemy.Backend.model.request.AddCategoryRequest;
 import prodemy.Backend.model.response.CategoriesResponse;
-import prodemy.Backend.model.response.ProductsResponse;
 
 public interface CategoriesService {
 
-    List<ProductsResponse> getAllProductsByCategoryId(Long id);
-
-    List<CategoriesResponse> getAllCategories();
+    List<CategoriesResponse> getAllCategories(Map<String, String> params);
 
     CategoriesResponse getCategoriesById(Long id);
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import prodemy.Backend.model.entity.TransactionDetails;
 import prodemy.Backend.model.entity.Transactions;
 import prodemy.Backend.model.request.AddTransactionDetailsRequest;
 import prodemy.Backend.model.request.AddTransactionsRequest;
+import prodemy.Backend.model.request.SearchCriteria;
 import prodemy.Backend.model.response.DetailsTransactionProduct;
 import prodemy.Backend.model.response.DetailsTransactionResponse;
 import prodemy.Backend.model.response.TransactionsResponse;
@@ -44,19 +46,32 @@ public class TransactionsServiceI implements TransactionsService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TransactionsResponse> getAllTransactions(List<String> products) {
+    public List<TransactionsResponse> getAllTransactions(Map<String, String> params) {
 
         List<Specification<Transactions>> lSpecifications = new ArrayList<>();
 
-        if (products != null) {
-            for (String productId : products) {
-                Specification<Transactions> spec = new TransactionsSpecifications(productId);
-                lSpecifications.add(spec);
-            }
-        }
+        // if (params.containsKey("products")) {
+        // List<String> products = params.get("products");
+        // for (String productId : products) {
+        // SearchCriteria criteria = SearchCriteria.builder().key(productId)
+        // Specification<Transactions> spec = new TransactionsSpecifications();
+        // lSpecifications.add(spec);
+        // }
+        // }
 
+        for (String key : params.keySet()) {
+            Specification<Transactions> spec = Specification.anyOf(
+                    TransactionsSpecifications.builder()
+                            .criteria(new SearchCriteria(
+                                    key,
+                                    params.get(key)))
+                            .build());
+
+            lSpecifications.add(spec);
+
+        }
         // GET DATA FROM DATABASE
-        List<Transactions> transactions = tRepository.findAll(Specification.anyOf(lSpecifications));
+        List<Transactions> transactions = tRepository.findAll(Specification.allOf(lSpecifications));
 
         // TRANSFORM DATA FROM DATABASE TO RESPONSE
         List<TransactionsResponse> tResponses = new ArrayList<>();

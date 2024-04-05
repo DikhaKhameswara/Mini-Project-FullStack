@@ -47,7 +47,6 @@ public class ProductsServiceI implements ProductsService {
         List<Products> products = new ArrayList<>();
 
         List<Specification<Products>> specs = new ArrayList<>();
-        System.out.println(params);
 
         for (String search : params.keySet()) {
             Specification<Products> pSpecs = Specification.where(

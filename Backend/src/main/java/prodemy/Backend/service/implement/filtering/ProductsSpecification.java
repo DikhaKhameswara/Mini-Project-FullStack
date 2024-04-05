@@ -15,16 +15,16 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import prodemy.Backend.model.entity.Categories;
 import prodemy.Backend.model.entity.Products;
 import prodemy.Backend.model.request.SearchCriteria;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Slf4j
 public class ProductsSpecification implements Specification<Products> {
 
     private SearchCriteria criteria;
@@ -48,14 +48,12 @@ public class ProductsSpecification implements Specification<Products> {
         }
 
         if (criteria.getKey().equalsIgnoreCase("sort_by")) {
+
             if (!sortByList.contains(criteria.getValue().toString().toLowerCase())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "FITUR SORTING TIDAK DITEMUKAN");
             }
-        }
 
-        if (criteria.getKey().equalsIgnoreCase("sort_by")) {
-
-            ProductsSpecification.sortBy = criteria.getValue().toString();
+            sortBy = criteria.getValue().toString();
             if (sortOrder == null) {
                 query.orderBy(criteriaBuilder.asc(root.get(criteria.getValue().toString())));
             } else {
@@ -68,14 +66,12 @@ public class ProductsSpecification implements Specification<Products> {
         }
 
         if (criteria.getKey().equalsIgnoreCase("sort_order")) {
+
             if (!sortOrderList.contains(criteria.getValue().toString().toLowerCase())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "FITUR SORTING TIDAK DITEMUKAN");
             }
-        }
 
-        if (criteria.getKey().equalsIgnoreCase("sort_order")) {
-
-            ProductsSpecification.sortOrder = criteria.getValue().toString();
+            sortOrder = criteria.getValue().toString();
             if (sortBy != null) {
                 if (sortOrder.equalsIgnoreCase("asc")) {
                     query.orderBy(criteriaBuilder.asc(root.get(sortBy)));
@@ -83,7 +79,33 @@ public class ProductsSpecification implements Specification<Products> {
                     query.orderBy(criteriaBuilder.desc(root.get(sortBy)));
                 }
             }
+        }
 
+        if (criteria.getKey().equalsIgnoreCase("start_price") ||
+                criteria.getKey().equalsIgnoreCase("end_price")) {
+
+            if (criteria.getValue().toString().isEmpty()) {
+                return null;
+            }
+
+            Long price = 0L;
+            try {
+                price = Long.parseLong(criteria.getValue().toString());
+            } catch (NumberFormatException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PRICE HARUS ANGKA");
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            }
+
+            if (price < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PRICE HARUS DIATAS ATAU SAMA DENGAN RP.0");
+            }
+
+            if (criteria.getKey().equalsIgnoreCase("start_price")) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("price"), price);
+            } else {
+                return criteriaBuilder.lessThanOrEqualTo(root.get("price"), price);
+            }
         }
 
         return null;

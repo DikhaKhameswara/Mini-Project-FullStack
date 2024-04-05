@@ -8,6 +8,8 @@ import React, { useState } from 'react';
 
 export default function MyTable({ data, columns }) {
 
+    const sizeColumn = `w-[${100 / columns.length}%]`;
+
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 5
@@ -26,7 +28,7 @@ export default function MyTable({ data, columns }) {
         }
         // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
     })
-    const sizeColumn = `w-[${100 / columns.length}%]`;
+
 
     return (
         <div className=" flex place-content-center">
@@ -86,7 +88,7 @@ export default function MyTable({ data, columns }) {
                             {table.getHeaderGroups()?.map(headerGroup => (
                                 <tr key={headerGroup.id} className=" w-full">
                                     {headerGroup.headers.map(header => (
-                                        <th key={header.id} colSpan={header.colSpan} className=" border-r-2 border-l-2 border-white">
+                                        <th key={header.id} colSpan={header.colSpan} className={`border-x-2 border-white w-[20%]`}>
                                             <div className="m-2">
                                                 {flexRender(
                                                     header.column.columnDef.header,
